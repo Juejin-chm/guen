@@ -1,0 +1,275 @@
+{
+	"pages": [ 
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},{
+			"path": "pages/join/join",
+			"style": {
+				"navigationBarTitleText": "加入我们"
+			}
+		},{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		}
+        ,{
+            "path" : "component/CustomBar/CustomBar",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/series/series",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "餐盒样式",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "component/BarBg/BarBg",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/seriesDetail/seriesDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/business/business",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "商家入驻",
+                "enablePullDownRefresh": false
+            }
+        }
+        ,{
+            "path" : "pages/tip/tip",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "提交成功",
+                "enablePullDownRefresh": false,
+				"navigationStyle":"default"
+            }
+            
+        }
+        ,{
+            "path" : "pages/apply/apply",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的申请",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/applyDetail/applyDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "待审核",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/applyBox/applyBox",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "申请领取盒子",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/message/message",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "消息通知",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/messageDetail/messageDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "消息通知",
+                "enablePullDownRefresh": false,
+				"navigationStyle":"default"
+            }
+            
+        }
+        ,{
+            "path" : "pages/box/box",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "盒子订单",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/boxDetail/boxDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "盒子详情",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/record/record",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "发放记录",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/commission/commission",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "消息通知",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/myCommission/myCommission",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的佣金",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/myTeam/myTeam",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的团队",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/package/package",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "投放套餐",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/packageDetail/packageDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "套餐详情",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/order/order",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "投放订单",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/orderDetail/orderDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "投放订单详情",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/orderNotic/orderNotic",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "订单通知",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "component/Selects/Selects",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/poster/poster",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "推广海报",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#fff",
+		"backgroundColor": "#fff",
+		"navigationStyle":"custom",
+		"usingComponents": {
+		    "van-button": "wxcomponents/dist/button/index",
+			"van-cell": "wxcomponents/dist/cell/index",
+			"van-cell-group": "wxcomponents/dist/cell-group/index",
+			"van-field": "wxcomponents/dist/field/index",
+			"van-popup": "wxcomponents/dist/popup/index",
+			"van-radio": "wxcomponents/dist/radio/index",
+			"van-radio-group": "wxcomponents/dist/radio-group/index"
+		}
+	},
+	"tabBar": {
+		"color": "#c8c8c8",
+		"selectedColor": "#111111",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+			"pagePath": "pages/index/index",
+			"iconPath": "static/image/tabbar-1.png",
+			"selectedIconPath": "static/image/tabbar-l1.png",
+			"text": "首页"
+		},{
+			"pagePath": "pages/join/join",
+			"iconPath": "static/image/tabbar-2.png",
+			"selectedIconPath": "static/image/tabbar-l2.png",
+			"text": "加入我们"
+		},{
+			"pagePath": "pages/my/my",
+			"iconPath": "static/image/tabbar-3.png",
+			"selectedIconPath": "static/image/tabbar-l3.png",
+			"text": "我的"
+		}]
+	}
+}

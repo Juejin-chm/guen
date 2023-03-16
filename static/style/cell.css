@@ -1,0 +1,266 @@
+.otabs {
+  display: flex;
+  margin: 20rpx auto 30rpx;
+  position: relative;
+  justify-content: center;
+}
+.otabs > view {
+  width: 150rpx;
+  height: 70rpx;
+  text-align: center;
+  line-height: 68rpx;
+  background-color: rgba(17, 17, 17, 0.7);
+  border: 1rpx solid rgba(255, 255, 255, 0.7);
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+.otabs > view.cur {
+  background-color: #cba868;
+  border-color: #cba868;
+}
+.boxhui {
+  padding: 28rpx 0;
+}
+.cellbor {
+  margin: 24rpx 0;
+  border-radius: 14rpx;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+.cellbor /deep/ .van-cell .van-cell__title,
+.cellbor /deep/ .van-cell .van-cell__value {
+  font-size: 28rpx;
+}
+.cellbor /deep/ .van-cell .van-cell__title {
+  color: #b5b5b5;
+  flex-basis: 30%;
+}
+.cellbor /deep/ .van-cell .van-cell__value {
+  color: #111;
+  flex: auto;
+}
+.cellbor .h /deep/ .van-cell .van-cell__title {
+  font-weight: 700;
+  font-size: 30rpx;
+  color: #111111;
+  flex-basis: 60%;
+}
+.cellbor .h /deep/ .van-cell .van-cell__value {
+  color: #cba868;
+}
+.cellbor .h /deep/ .van-cell .red {
+  color: #ff5050;
+}
+.cellbor .h /deep/ .van-cell .green {
+  color: #189b73;
+}
+.cellbor .h /deep/ .van-cell text {
+  color: #b5b5b5;
+  font-size: 30rpx;
+}
+.cellbor .msg /deep/ .van-cell .van-cell__value {
+  text-align: left;
+  min-height: 100rpx;
+}
+.cellbor .space {
+  padding: 8px 0;
+}
+.cellbor .space /deep/ .van-cell {
+  padding-top: 8rpx;
+  padding-bottom: 8rpx;
+}
+.cellbor .space.spaceNum view {
+  color: #666666;
+  line-height: 50rpx;
+  padding: 0 35rpx;
+}
+.cellbor .space.spaceNum view text {
+  color: #cba868;
+  padding-left: 14rpx;
+}
+.cellbor .space.spaceNum .head {
+  padding-top: 16rpx;
+}
+.cellbor .space.spaceNum .head image,
+.cellbor .space.spaceNum .head text {
+  display: inline-block;
+  vertical-align: middle;
+}
+.cellbor .space.spaceNum .head image {
+  width: 80rpx;
+  height: 80rpx;
+  border: 1rpx solid #e4e4e4;
+  border-radius: 50%;
+}
+.cellbor .space.spaceNum .head text {
+  color: #111111;
+  font-size: 30rpx;
+  margin-left: 25rpx;
+}
+.cellbor.cellbor-le /deep/ .van-cell .van-cell__title {
+  color: #666666;
+  flex-basis: 38%;
+}
+.cellbor.cellbor-le /deep/ .van-cell .van-cell__value {
+  color: #111111;
+  text-align: left;
+  flex-basis: 62%;
+}
+.cellbor.cellborhui /deep/ .van-cell .van-cell__title {
+  color: #b5b5b5;
+}
+.cellbor.cellborhui /deep/ .van-cell .van-cell__value {
+  color: #b5b5b5;
+}
+.cellbor .tel image {
+  width: 32rpx;
+  height: 32rpx;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 16rpx;
+}
+.cellbor .ft {
+  border-top: 1rpx solid #d2d2d2;
+  padding: 24rpx 0;
+  margin: 0 16px;
+  text-align: right;
+}
+.cellbor .ft .btn {
+  width: 184rpx;
+  height: 66rpx;
+  text-align: center;
+  line-height: 64rpx;
+  border: 1rpx solid #cba868;
+  border-radius: 34rpx;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 30rpx;
+  margin: 0;
+  background-color: #cba868;
+  display: inline-block;
+}
+.cellbor .ft .btn.cancel {
+  background-color: #fff;
+  border-color: #b5b5b5;
+  color: #b5b5b5;
+}
+.cellbor.address {
+  padding: 28rpx 34rpx;
+}
+.cellbor.address image,
+.cellbor.address text {
+  display: inline-block;
+  vertical-align: middle;
+}
+.cellbor.address .h {
+  font-weight: 700;
+  color: #111111;
+  font-size: 32rpx;
+  margin-bottom: 16rpx;
+}
+.cellbor.address .h text {
+  display: inline-block;
+  margin-left: 32rpx;
+  font-weight: normal;
+}
+.cellbor.address view image {
+  width: 38rpx;
+  height: 36rpx;
+  margin-right: 14rpx;
+}
+.cellouter .name {
+  font-size: 30rpx;
+}
+.timer {
+  margin-bottom: 4rpx;
+}
+.timer picker {
+  height: 56rpx;
+  font-size: 0;
+  background-color: #ffffff;
+  border-radius: 28rpx;
+  padding: 10rpx 20rpx;
+  box-sizing: border-box;
+}
+.timer picker image,
+.timer picker text {
+  display: inline-block;
+  vertical-align: middle;
+}
+.timer picker image {
+  width: 29rpx;
+  height: 29rpx;
+  margin-right: 20rpx;
+}
+.timer picker text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #b5b5b5;
+  min-width: 150rpx;
+}
+.timer picker .hei {
+  color: #111;
+}
+.ex-name {
+  align-items: center;
+}
+.ex-name .le {
+  font-weight: 700;
+  color: #111111;
+  font-size: 34rpx;
+}
+.ex-name.ex-nameul .le view {
+  color: #b5b5b5;
+  font-size: 32rpx;
+  position: relative;
+  padding-bottom: 20rpx;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 60rpx;
+}
+.ex-name.ex-nameul .le view::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  margin-left: -16rpx;
+  width: 32rpx;
+  height: 8rpx;
+  border-radius: 20rpx;
+}
+.ex-name.ex-nameul .le view.act {
+  color: #111111;
+}
+.ex-name.ex-nameul .le view.act::after {
+  background-color: #111111;
+}
+.ex-name.ex-nameul .le view:last-child {
+  margin-right: 0;
+}
+.ex-name.ex-nameul .timer {
+  margin-bottom: 20rpx;
+}
+.status {
+  margin: 30rpx 0 40rpx;
+}
+.status image,
+.status text {
+  display: inline-block;
+  vertical-align: middle;
+}
+.status image {
+  width: 42rpx;
+  height: 42rpx;
+  margin-right: 20rpx;
+}
+.status text {
+  font-weight: 700;
+  color: #dfbc78;
+  font-size: 32rpx;
+}
+.status .time {
+  color: #dfbc78;
+  margin-top: 12rpx;
+}
