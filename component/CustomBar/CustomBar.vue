@@ -27,6 +27,7 @@
 				navHeight:app.globalData.navHeight,
 			}
 		},
+		
 		methods:{
 			goBack(){
 				uni.navigateBack({

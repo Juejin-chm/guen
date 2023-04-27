@@ -14,12 +14,12 @@
 				:style="{height: swiperConfig.height}" 
 				@change="curChange"
 			>
-			  <swiper-item v-for="item in swiperArr">
+			  <swiper-item v-for="(item, index) in swiperArr" :key="index">
 				<image :src="item" mode="widthFix"></image>
 			  </swiper-item>
 			</swiper>
 			<view class="s_dots">
-				<view :class="current==index?'active':''" v-for="index in swiperArr.length"></view>
+				<view :class="current==index?'active':''" v-for="index in swiperArr.length" :key="index"></view>
 			</view>
 		</view>
 		
@@ -29,7 +29,7 @@
 					<view class="verin" v-if="adArr.length>0">
 					   <image src="@/static/image/verimg.png"></image>
 					   <swiper :circular='true' :vertical='true' :autoplay='true'>
-							<swiper-item v-for="item in adArr">
+							<swiper-item v-for="item in adArr" :key="item">
 								<view class="txthide">{{item}}<text>查看更多</text></view>
 							</swiper-item>
 					   </swiper>
@@ -59,27 +59,27 @@
 				<view class="datas flex-between">
 					<view class="dali">
 						<view>平台用户</view>
-						<view class="b">26541</view>
+						<view class="b">{{platData.users_count}}</view>
 						<image src="@/static/image/datas1.png" mode="widthFix"></image>
 					</view>
 					<view class="dali">
 						<view>曝光率</view>
-						<view class="b">26541</view>
+						<view class="b">{{platData.bgl}}</view>
 						<image src="@/static/image/datas2.png" mode="widthFix"></image>
 					</view>
 					<view class="dali">
 						<view>广告主</view>
-						<view class="b">26541</view>
+						<view class="b">{{platData.ggz_count}}</view>
 						<image src="@/static/image/datas3.png" mode="widthFix"></image>
 					</view>
 					<view class="dali dalibig">
 						<view>商家入驻</view>
-						<view class="b">26541</view>
+						<view class="b">{{platData.bus_count}}</view>
 						<image src="@/static/image/datas4.png" mode="widthFix"></image>
 					</view>
 					<view class="dali dalibig">
 						<view>推广大使</view>
-						<view class="b">26541</view>
+						<view class="b">{{platData.tgds_count}}</view>
 						<image src="@/static/image/datas5.png" mode="widthFix"></image>
 					</view>
 				</view>
@@ -90,43 +90,16 @@
 				
 				<div class="ititr">
 					<view class="itit"><span>金盒子数据</span></view>
-					<view class="more"><navigator hover-class="none" url="../series/series">更多 ></navigator></view>
+					<view class="more"><navigator hover-class="none" url="../series/series">更多 &gt;</navigator></view>
 				</div>
 			</view>
-			
-			<view class="setabs">
-				<view :class="setindex==index?'cur':''" v-for="(item,index) in tabArr" @tap="clitabs(index)">{{item}}</view>
-			</view>
-			<view class="outer">
-				<view class="setul">
-					<swiper :display-multiple-items='3'>
-						<swiper-item>
-							<navigator class="setli" url="../seriesDetail/seriesDetail" hover-class="none">
-								<image src="@/static/image/2038.png" mode="widthFix"></image>
-								<view class="name txthide">500方盒</view>
-							</navigator>
-						</swiper-item>
-						<swiper-item>
-							<navigator class="setli" url="../seriesDetail/seriesDetail" hover-class="none">
-								<image src="@/static/image/2038.png" mode="widthFix"></image>
-								<view class="name txthide">500方盒</view>
-							</navigator>
-						</swiper-item>
-						<swiper-item>
-							<navigator class="setli" url="../seriesDetail/seriesDetail" hover-class="none">
-								<image src="@/static/image/2038.png" mode="widthFix"></image>
-								<view class="name txthide">500方盒</view>
-							</navigator>
-						</swiper-item>
-						<swiper-item>
-							<navigator class="setli" url="../seriesDetail/seriesDetail" hover-class="none">
-								<image src="@/static/image/2038.png" mode="widthFix"></image>
-								<view class="name txthide">500方盒</view>
-							</navigator>
-						</swiper-item>
-					</swiper>
-				</view>
-			</view>
+			<the-series
+				is-swiper
+				:tabArr="tabArr"
+				:boxes="boxes"
+				@tabChange="tabChange"
+			/>
+			<!-- <button open-type="getPhoneNumber">getPhoneNumber</button> -->
 		</view>
 		
 		
@@ -134,37 +107,73 @@
 </template>
 
 <script>
+import theSeries from '@/component/Series'
+import req from '../../request/index.js'
+import { login } from '../../request/auth.js'
 	export default {
+		components: { theSeries },
 		data() {
 			return {
 				barConfig: {
 					title:'金盒子',
 					top:''
 				},
-				swiperArr:['../../static/image/banner.png','../../static/image/banner.png'],
+				swiperArr:[],
 				swiperConfig:{
 					autoplay:true,
 					circular:true,
 					height:'280rpx',
 				},
 				current:0,
-				adArr:["1平台消息通知平台消息通知平平台消息通知平台消息通知平平台消息通知平台消息通知平","2平台消息通知平台消息通知平平台消息通知平台消息通知平平台消息通知平台消息通知平"],
-				tabArr:['方盒系列','正方盒系列','圆形系列','美式圆形系列','方盒系列','方盒系列','方盒系列'],
+				adArr:[],
+				tabArr:[],
 				setindex:0,
-				scrollTimer : null
+				scrollTimer : null,
+				platData: {
+					bgl: 0,
+					bus_count: 0,
+					ggz_count: 0,
+					tgds_count: 0,
+					users_count: 0
+				},
+				boxes: [],
+				code: '',
 			}
 		},
 		onLoad() {
-
+			this.getPageData()
+			uni.getUserInfo({
+				success(res) {
+					console.log(res, '11111');
+				}
+			})
 		},
 		methods: {
+			
 			curChange(e){
 				this.current = e.detail.current;
 			},
 			clitabs(index){
 				this.setindex = index;
 			},
-		}
+			getPageData() {
+				req('/index-index').then(data => {
+					const res = data.data
+					this.swiperArr = res.topBanners.map(item => item.url)
+					this.adArr = res.platformNews
+					this.tabArr = res.boxCates
+					this.platData = res.platData
+					this.boxes = res.boxes
+				})
+			},
+			tabChange(id) {
+				req('/get-box-by-cate', {
+					cate_id: id
+				}).then(({data}) => {
+					this.boxes = data.data
+				})
+			}
+		},
 	}
 </script>
 

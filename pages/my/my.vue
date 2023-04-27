@@ -8,7 +8,10 @@
 				<view class="head">
 					<image src="@/static/image/head.png"></image>
 					<view>
-						<view class="b name">点击授权登录</view>
+						<view class="b name">
+							<button v-if="!access_token" class="phone-number-btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">点击授权登录</button>
+							<template v-else>{{ nickname }}</template>
+						</view>
 						<view class="ul" v-if="identity>0">
 							<view class="li" v-if="identity==1">
 								<image src="@/static/image/n1.png"></image>
@@ -33,7 +36,7 @@
 				</view>
 				<view class="rolename"><image src="@/static/image/switch.png"></image><text>切换角色</text></view>
 				<view class="roles flex-between">
-					<view v-for="(item,index) in idenArr" :class="{'cur':identity==(index+1),'opc':identity==0}" @tap="changeIden(index+1,item.hasAuth)">
+					<view v-for="(item,index) in idenArr" :key="index" :class="{'cur':identity==(index+1),'opc':identity==0}" @tap="changeIden(index+1,item.hasAuth)">
 						<image :src="`../../static/image/r${index+1}.png`"></image>
 						<text>{{item.title}}</text>
 					</view>
@@ -45,16 +48,16 @@
 				<template v-if="identity==0">
 					<view class="mh">我的申请</view>
 					<view class="mul">
-						<view @tap="goApply">
+						<view @tap="goApply('all')">
 							<image src="../../static/image/m1.png"></image>
 							<view>全部审核</view>
 						</view>
-						<view @tap="goApply">
-							<image src="../../static/image/m1.png"></image>
+						<view @tap="goApply(0)">
+							<image src="../../static/image/m2.png"></image>
 							<view>待审核</view>
 						</view>
-						<view @tap="goApply">
-							<image src="../../static/image/m1.png"></image>
+						<view @tap="goApply(2)">
+							<image src="../../static/image/m3.png"></image>
 							<view>审核驳回</view>
 						</view>
 					</view>
@@ -209,16 +212,16 @@
 				<view class="h2">获取你的昵称、头像</view>
 				<view class="loginfo">
 					<text>头像：</text>
-					<button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+					<button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
 					  <image class="avatar" :src="avatarUrl"></image>
 					</button> 
 				</view>
 				<view class="loginfo">
 					<text>昵称:</text>
-					<input type="nickname" class="weui-input" placeholder="点击填写"/>
+					<input type="nickname" class="weui-input" placeholder="点击填写" name="nickname" @blur="blur"/>
 				</view>
-				<button class="btn confirm">允许</button>
-				<button class="btn refuse">拒绝</button>
+				<button class="btn confirm" @click="sumbit">允许</button>
+				<button class="btn refuse" @click="showAuth = false">拒绝</button>
 			</view>
 		</view>
 		
@@ -226,6 +229,7 @@
 </template>
 
 <script>
+	import { login } from '@/request/auth.js'
 	export default {
 		data() {
 			return {
@@ -250,32 +254,69 @@
 					title:'广告主',
 					hasAuth:false,
 				}],
-				avatarUrl:'../../static/image/avatar.png',
+				
+				avatarUrl: uni.getStorageSync('avatarUrl'),
+				nickname: uni.getStorageSync('nickname'),
+				access_token: uni.getStorageSync('access_token'),
 				showAuth:false,
 			}
 		},
+		onLoad() {
+			this.$api('/role-list').then(({data}) => {
+				this.idenArr[0].hasAuth = data[1].has_role || true
+				this.idenArr[1].hasAuth = data[2].has_role || true
+				this.idenArr[2].hasAuth = data[3].has_role || true
+			})
+		},
 		methods: {
+			blur(e) {
+				const { value: nickname } = e.detail
+				uni.setStorageSync('nickname', nickname)
+			},
+			onChooseAvatar(e) {
+				const { avatarUrl } = e.detail
+				if (avatarUrl) {
+					this.avatarUrl = avatarUrl
+					uni.setStorageSync('avatarUrl', avatarUrl)
+				}
+			},
+			async getPhoneNumber(e) {
+				const { code } = e.detail
+				// 手机号本地存储
+				if (code) {
+					const { data: phone } = await this.$api('/auth-phone', { code })
+					uni.setStorageSync('phone', phone)
+					this.showAuth = true
+				}
+			},
+			sumbit() {
+				login().then((data) => {
+					this.nickname = data.nickname
+					this.avatarUrl = data.avatarUrl
+					this.showAuth = false
+				})
+			},
 			changeIden(index,hasAuth){
 				//普通用户申请角色未审核成功的，点击切换的角色时，跳出提醒“您还不是XXX，请申请认证”
-				// if(hasAuth){
+				if(hasAuth){
 					this.identity = index;
-				// }else{
-				// 	uni.showModal({
-				// 		title: '提示',
-				// 		content: '您还不是XXX，请申请认证',
-				// 		success: function (res) {
-				// 			if (res.confirm) {
-				// 				console.log('用户点击确定');
-				// 			} else if (res.cancel) {
-				// 				console.log('用户点击取消');
-				// 			}
-				// 		}
-				// 	});
-				// }
+				}else{
+					uni.showModal({
+						title: '提示',
+						content: '您还不是XXX，请申请认证',
+						success: function (res) {
+							if (res.confirm) {
+								console.log('用户点击确定');
+							} else if (res.cancel) {
+								console.log('用户点击取消');
+							}
+						}
+					});
+				}
 			},
-			goApply(){
+			goApply(key){
 				uni.navigateTo({
-					url:'../apply/apply'
+					url:'../apply/apply?key=' + key
 				})
 			},
 			goBox(){
@@ -292,6 +333,11 @@
 	page{background-color:#f9f9f9;}
 </style>
 <style scoped lang="less">
+	.phone-number-btn {
+		display: inline-block;
+		background: transparent;
+		color: white;
+	}
 	.header{padding-top: 20rpx;
 		image,text{display: inline-block;vertical-align: middle;}
 		image{width: 40rpx;height: 40rpx;margin-right: 10rpx;}

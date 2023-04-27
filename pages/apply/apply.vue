@@ -4,9 +4,9 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view class="cur">全部</view>
-			<view>待审核</view>
-			<view>驳回</view>
+			<view v-for="item in tabs" :key="item.key" :class="{cur: curTab == item.key}" @click="tabClick(item.key)">{{ item.value }}</view>
+			<!-- <view>待审核</view>
+			<view>驳回</view> -->
 		</view>
 		<view class="box boxhui">
 			<view class="outer">
@@ -61,13 +61,35 @@
 					isCenter:true,
 					date:null,
 				},
+				tabs: [],
+				curTab: 'all',
 			}
 		},
+		onLoad(option) {
+			this.curTab = option.key
+			console.log(option,11);
+			this.$api('/examine-status-title').then(({data}) =>{
+				this.tabs = data
+			})
+			
+		},
 		methods: {
+			getList(status, month) {
+				this.$api('/user-examine-list', {
+					status,
+					search_month: month
+				}).then(({data}) => {
+					
+				})
+			},
 			bindDateChange(e){
 				console.log(e.detail.value)
 				this.date = e.detail.value;
 			},
+			tabClick(key) {
+				this.curTab = key
+				this.getList(key, this.date)
+			}
 		}
 	}
 </script>

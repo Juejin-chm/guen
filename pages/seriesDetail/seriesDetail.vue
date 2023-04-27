@@ -4,11 +4,8 @@
 		
 		<view class="swiper">
 			<swiper :indicator-dots="true" indicator-color="rgba(255,255,255,0.7)" indicator-active-color="rgba(255,255,255,1)" :autoplay="true" style="height: 750rpx;">
-				<swiper-item>
-					<image src="@/static/image/2038.png" mode="widthFix"></image>
-				</swiper-item>
-				<swiper-item>
-					<image src="@/static/image/2038.png" mode="widthFix"></image>
+				<swiper-item v-for="item in boxData.imgs">
+					<image :src="item" mode="widthFix"></image>
 				</swiper-item>
 			</swiper>
 		</view>
@@ -19,14 +16,10 @@
 				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space">
-							<van-cell title="名称：" :border='false' value="500方盒"/>
-							<van-cell title="类型：" :border='false' value="方盒系列"/>
+							<van-cell title="名称：" :border='false' :value="boxData.title"/>
+							<van-cell title="类型：" :border='false' :value="boxData.category.name"/>
 							<van-cell title="盒子尺寸(mm)：" :border='false'>
-								<view>
-									底  90.7*143.7<br/>
-									盖  169*116<br/>
-									高  33<br/>
-								</view>
+								<view v-html="boxData.size"></view>
 							</van-cell>
 						</view>
 					</van-cell-group>
@@ -54,7 +47,21 @@
 					hasPadding:true,
 					isCenter:true,
 				},
+				boxData: {
+					imgs: [],
+					size: '',
+					title: '',
+					category: {
+						name: ''
+					}
+				}
 			}
+		},
+		onLoad(query) {
+			this.$api(`/box-detail/${query.id}`).then(({data}) => {
+				this.barConfig.title = data.title
+				this.boxData = data
+			})
 		},
 		methods: {
 			

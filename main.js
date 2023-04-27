@@ -3,10 +3,13 @@ import Vue from 'vue'
 import CustomBar from './component/CustomBar/CustomBar'
 import BarBg from './component/BarBg/BarBg'
 import Selects from './component/Selects/Selects'
+import api from './request/index.js'
+
 Vue.component('CustomBar',CustomBar)
 Vue.component('BarBg',BarBg)
 Vue.component('select-lay',Selects)
 
+Vue.prototype.$api = api
 // #ifndef VUE3
 Vue.config.productionTip = false
 App.mpType = 'app'

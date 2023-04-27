@@ -5,9 +5,9 @@
 		
 		<form @submit="submit">
 			<van-cell-group inset class="v-group" :border='false'>
-				<van-field label="姓名" placeholder="请输入"  />
-				<van-field label="联系电话" placeholder="请输入" />
-				<van-field label="门店名称" placeholder="请输入" v-if="type==0" />
+				<van-field label="姓名" placeholder="请输入" @change="(e) => formData.name = e.detail" />
+				<van-field label="联系电话" placeholder="请输入" @change="(e) => formData.mobile = e.detail" />
+				<van-field label="门店名称" placeholder="请输入" v-if="type==0" @change="(e) => formData.bus_store_name = e.detail" />
 				
 				<template v-if='type===1'>
 					<van-cell title="是否有上级" :border='false'>
@@ -20,7 +20,7 @@
 							</van-radio>
 						</van-radio-group>
 					</van-cell>
-					<van-field class="vfield-line" placeholder="请输入上级推广码" />
+					<van-field class="vfield-line" placeholder="请输入上级推广码" @change="(e) => formData.ds_top_code = e.detail" :disabled="radio === '1'" />
 				</template>
 				
 				<template v-if="type!=2">
@@ -29,22 +29,22 @@
 							<view :class="pickerValue?'value':''">{{pickerValue?pickerValue:'请选择省/市/区'}}</view>
 						</picker>
 					</van-cell>
-					<van-field class="vfield-line" :border='false' placeholder="请输入详细地址" />
+					<van-field class="vfield-line" :border='false' placeholder="请输入详细地址" @change="(e) => formData.detail_addr = e.detail" />
 				</template>
 				
-				<van-field label="公司名称" placeholder="请输入" v-if="type==2"/>
+				<van-field label="公司名称" placeholder="请输入" v-if="type==2" @change="(e) => formData.ggz_company = e.detail"/>
 			</van-cell-group>
 			
-			<template v-if='type!=2'>
+			<template v-if="type!=2">
 				<van-cell-group inset class="v-group" :border='false'>
 					<van-field label="身份证号" placeholder="请输入" v-if="type==1"/>
 					<van-cell :title="type===1?'上传身份证':'上传营业执照及卫生许可证'"></van-cell>
 					<view class="upimgul">
 						<view class="upimgli" @tap="upfiles(1)">
-							<image slot :src="src1?src1:'../../static/image/upimg.png'" mode="aspectFit"></image>
+							<image slot :src="src1 || '../../static/image/upimg.png'" mode="aspectFit"></image>
 						</view>
 						<view class="upimgli" @tap="upfiles(2)">
-							<image slot :src="src2?src2:'../../static/image/upimg.png'" mode="aspectFit"></image>
+							<image slot :src="src2 || '../../static/image/upimg.png'" mode="aspectFit"></image>
 						</view>
 					</view>
 				</van-cell-group>
@@ -52,15 +52,15 @@
 			
 			<van-cell-group inset class="v-group" :border='false'>
 				<view class="vcell-msg-warp">
-					<van-field label="留言备注" type="textarea" class="vcell-msg" placeholder="请输入..." ></van-field>
+					<van-field label="留言备注" type="textarea" class="vcell-msg" placeholder="请输入..." @change="(e) => formData.remark = e.detail" ></van-field>
 				</view>
 			</van-cell-group>
 			
 			<van-cell-group inset class="v-group" :border='false'>
 				<view class="vcell-code-warp">
-					<van-field placeholder="请输入验证码" :border='false'>
+					<van-field placeholder="请输入验证码" :border='false' @change="(e) => formData.code = e.detail">
 						<view slot='right-icon'>
-							<image src="@/static/image/code.png"></image>
+							<image :src="codeImg"></image>
 						</view>
 					</van-field>
 				</view>
@@ -80,6 +80,7 @@
 	export default {
 		data() {
 			return {
+				codeImg: '', // 验证码
 				barConfig: {
 					title:'商家入驻',
 					hasRetun:true,
@@ -94,20 +95,70 @@
 				    active: '../../static/image/icon-active.png',
 				},
 				type:0,
-				scrollTimer : null
+				scrollTimer : null,
+				formData: {
+					role_type: '',
+					
+					name: '',
+					mobile: '',
+					code: '',
+					bus_store_name: '',
+					bus_license: '',
+					bus_hygiene_license: '',
+					province: '',
+					city: '',
+					county:'',
+					detail_addr: '',
+					remark: '',
+					
+					ds_is_topds_is_top: '', // 推广大使_是否有上级
+					ds_top_code: '',  // 推广大使_推广码 需判断有上级时必填
+					ds_identity_code: '', // 推广大使_身份证号
+					ds_identity_pic_positive: '', // 推广大使_身份证正面照片
+					ds_identity_pic_negative: '', // 推广大使_身份证反面照片
+					
+					ggz_company: '', // 广告主_公司名称
+				}
 			}
 		},
+		
 		onLoad(options) {
 			this.type = parseInt(options.type);
 			this.barConfig.title=options.title;
+			
+			this.$api('/get-code').then(({data}) => {
+				this.codeImg = data
+			})
 		},
 		methods: {
+			onChange(e, key) {
+				this.formData[key] = e.detail
+			},
 			submit(e){
-				uni.navigateTo({
-					url:'../tip/tip?isError=0'
+				this.formData.ds_is_topds_is_top = this.radio === '0'
+				if (this.type === 0) {
+					this.formData.bus_license = this.src1
+					this.formData.bus_hygiene_license = this.src2
+				}
+				if (this.type === 1) {
+					this.formData.ds_identity_pic_positive = this.src1
+					this.formData.ds_identity_pic_negative = this.src2
+				}
+				this.$api('/join-us-form-submit', this.formData).then((data) => {
+					uni.navigateTo({
+						url:'../tip/tip?isError=0'
+					})
 				})
+				return console.log(this.formData, this.radio, '1234')
+				
 			},
 			bindPickerChange: function(e) {
+				const [province, city, county] = e.detail.value
+				
+				this.formData.province = province
+				this.formData.city = city
+				this.formData.county = county
+				
 				this.pickerValue = e.detail.value.join('');
 			},
 			upfiles(e){
@@ -117,7 +168,23 @@
 				  sourceType: ['album', 'camera'],
 				  camera: 'back',
 				  success:(res)=>{
-					this[`src${e}`] = res.tempFiles[0].tempFilePath;
+						console.log(res, 'res............')
+						this[`src${e}`] = res.tempFiles[0].tempFilePath;
+						uni.uploadFile({
+							url: 'http://guen_czd.juejinvr.cn:8089/api/upload-img',
+							filePath: res.tempFiles[0].tempFilePath,
+							name: 'file',
+							header: {
+								Authorization: uni.getStorageSync('access_token')
+							},
+							formData: {
+								file: res.tempFiles[0].tempFilePath
+							},
+							success: (res) => {
+								console.log(JSON.parse(res.data).data.path, '1234o');
+								this[`src${e}`] = JSON.parse(res.data).data.path
+							}
+						})
 				  }
 				})
 			},
