@@ -37,7 +37,7 @@
 			
 			<template v-if="type!=2">
 				<van-cell-group inset class="v-group" :border='false'>
-					<van-field label="身份证号" placeholder="请输入" v-if="type==1"/>
+					<van-field label="身份证号" placeholder="请输入" v-if="type==1" @change="(e) => formData.ds_identity_code = e.detail"/>
 					<van-cell :title="type===1?'上传身份证':'上传营业执照及卫生许可证'"></van-cell>
 					<view class="upimgul">
 						<view class="upimgli" @tap="upfiles(1)">
@@ -144,6 +144,7 @@
 					this.formData.ds_identity_pic_positive = this.src1
 					this.formData.ds_identity_pic_negative = this.src2
 				}
+				this.formData.role_type = this.type + 1
 				this.$api('/join-us-form-submit', this.formData).then((data) => {
 					uni.navigateTo({
 						url:'../tip/tip?isError=0'

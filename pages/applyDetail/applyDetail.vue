@@ -5,19 +5,18 @@
 		
 		<view class="outer">
 			<view class="status">
-				<template v-if="status==1">
+				<template v-if="detail.status==0">
 					<image src="@/static/image/exa1.png"></image>
-					<text>商家入驻申请待审核</text>
+					<text>{{detail.title}}</text>
 				</template>
 				<template v-else>
 					<image src="@/static/image/exa2.png"></image>
-					<text>推广大使申请驳回</text>
+					<text>{{detail.title}}</text>
 				</template>
 			</view>
-			
-			<view class='cellbor' v-if="status==2">
+			<view class='cellbor' v-if="detail.status==2">
 				<van-cell-group :border="false">
-					<van-cell class='msg' :border="false" value='驳回原因.................'></van-cell>
+					<van-cell class='msg' :border="false" :value='detail.refund_reason'></van-cell>
 				</van-cell-group>
 			</view>
 			
@@ -25,16 +24,16 @@
 				<van-cell-group :border="false">
 					<van-cell class='h' title="审核信息"></van-cell>
 					<view class="space">
-						<van-cell title="姓名" value="某某某" :border="false" />
-						<van-cell title="联系电话" value="15456325972" :border="false" />
+						<van-cell title="姓名" :value="detail.name" :border="false" />
+						<van-cell title="联系电话" :value="detail.mobile" :border="false" />
 						<template v-if="status==1">
-							<van-cell title="门店名称" value="XXXXXX门店名称" :border="false" />
+							<van-cell title="门店名称" :value="detail.bus_store_name" :border="false" />
 						</template>
 						<template v-else>
-							<van-cell title="上级推广码" value="XXXXXX25444555" :border="false" />
+							<van-cell title="上级推广码" :value="detail.ds_top_code" :border="false" />
 						</template>
-						<van-cell title="门店地址" value="福建省厦门市湖里区高新技术园" :border="false" />
-						<van-cell title="申请日期" value="2023/02/15" :border="false" />
+						<van-cell title="门店地址" :value="address" :border="false" />
+						<van-cell title="申请日期" :value="detail.format_date" :border="false" />
 					</view>
 				</van-cell-group>
 			</view>
@@ -42,15 +41,15 @@
 			<view class='cellbor'>
 				<van-cell-group :border="false">
 					<van-cell class='h' :title="status==1?'营业执照及卫生许可证':'身份证信息'"></van-cell>
-					<template v-if="status==2">
-						<van-cell title="身份证号" value="3541269445211225" :border="false" />
+					<template v-if="detail.status==2">
+						<van-cell title="身份证号" :value="detail.ds_identity_code" :border="false" />
 					</template>
 					<view class="upimgul">
 						<view class="upimgli">
-							<image slot src="../../static/image/upimg.png" mode="aspectFit"></image>
+							<image slot :src="detail.bus_hygiene_license || detail.ds_identity_pic_positive" mode="aspectFit"></image>
 						</view>
 						<view class="upimgli">
-							<image slot src="../../static/image/upimg.png" mode="aspectFit"></image>
+							<image slot :src="detail.bus_license || detail.ds_identity_pic_negative" mode="aspectFit"></image>
 						</view>
 					</view>
 				</van-cell-group>
@@ -59,12 +58,12 @@
 			<view class='cellbor'>
 				<van-cell-group :border="false">
 					<van-cell class='h' title="留言备注"></van-cell>
-					<van-cell class='msg' :border="false" value='留言备注内容...........'></van-cell>
+					<van-cell class='msg' :border="false" :value='detail.remark'></van-cell>
 				</van-cell-group>
 			</view>
 			<view class='cellbor'>
 				<van-cell-group :border="false">
-					<van-cell class="tel" title="电话咨询" value="1545662245" :border="false" >
+					<van-cell class="tel" title="电话咨询" :value="phone" :border="false">
 						<view slot="right-icon">
 							<image src="../../static/image/tel.png" mode=""></image>
 						</view>
@@ -84,10 +83,26 @@
 				barConfig: {
 					title:'待审核',
 					hasRetun:true,
-					isCenter:true,
+					isCenter:true
 				},
 				status:1, //1-待审核  2-审核驳回
+				detail: {},
+				phone: ''
 			}
+		},
+		computed: {
+			address() {
+				const d = this.detail
+				return d.province + d.city + d.county
+			},
+			
+		},
+		onLoad(query) {
+			this.$api('/user-examine-detail/' + 12 || query.id).then(({data}) => {
+				console.log(data, 'data,,,,,,,,,');
+				this.detail = data.detail
+				this.phone = data.phone
+			})
 		},
 		methods: {
 			

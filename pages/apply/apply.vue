@@ -20,32 +20,32 @@
 						</picker>
 					</view>
 				</view>
-				
-				<view class='cellbor'>
-				    <van-cell-group :border="false">
-						<van-cell title="商家入驻审核" is-link url='/pages/applyDetail/applyDetail' class='h'>
-							<view>待审核</view>
-						</van-cell>
-						<view class="space">
-							<van-cell title="姓名：" value="某某某" :border="false" />
-							<van-cell title="门店：" value="门店名称XXXXXXX" :border="false" />
-							<van-cell title="提交日期：" value="2023/02/24" :border="false" />
-						</view>
-				    </van-cell-group>
-				</view>
-				<view class='cellbor'>
-				    <van-cell-group :border="false">
-						<van-cell title="成为推广大使审核" is-link url='/pages/applyDetail/applyDetail' class='h'>
-							<view class="red">审核驳回</view>
-						</van-cell>
-						<view class="space">
-							<van-cell title="姓名：" value="某某某" :border="false" />
-							<van-cell title="联系电话：" value="1578965462" :border="false" />
-							<van-cell title="提交日期：" value="2023/02/24" :border="false" />
-						</view>
-				    </van-cell-group>
-				</view>
-				
+				<template v-for="item in reviewList">
+					<view v-if="item.status === 0" class='cellbor' :key="item.id">
+							<van-cell-group :border="false">
+							<van-cell :title="item.title" is-link :url="`/pages/applyDetail/applyDetail?id=${item.id}`" class='h'>
+								<view>{{item.status_txt}}</view>
+							</van-cell>
+							<view class="space">
+								<van-cell title="姓名：" :value="item.name" :border="false" />
+								<van-cell title="门店：" :value="item.bus_store_name" :border="false" />
+								<van-cell title="提交日期：" :value="item.format_date" :border="false" />
+							</view>
+							</van-cell-group>
+					</view>
+					<view v-if="item.status === 2" class='cellbor' :key="item.id">
+							<van-cell-group :border="false">
+							<van-cell :title="item.title" is-link :url="`/pages/applyDetail/applyDetail?id=${item.id}`" class='h'>
+								<view class="red">{{ item.status_txt }}</view>
+							</van-cell>
+							<view class="space">
+								<van-cell title="姓名：" :value="item.name" :border="false" />
+								<van-cell title="联系电话：" :value="item.mobile" :border="false" />
+								<van-cell title="提交日期：" :value="item.format_date" :border="false" />
+							</view>
+							</van-cell-group>
+					</view>
+				</template>
 			</view>
 		</view>
 	</view>
@@ -63,6 +63,7 @@
 				},
 				tabs: [],
 				curTab: 'all',
+				reviewList: []
 			}
 		},
 		onLoad(option) {
@@ -70,16 +71,17 @@
 			console.log(option,11);
 			this.$api('/examine-status-title').then(({data}) =>{
 				this.tabs = data
+				this.getList(option.key)
 			})
 			
 		},
 		methods: {
-			getList(status, month) {
+			async getList(status, month) {
 				this.$api('/user-examine-list', {
 					status,
-					search_month: month
+					// search_month: month
 				}).then(({data}) => {
-					
+					this.reviewList = data
 				})
 			},
 			bindDateChange(e){

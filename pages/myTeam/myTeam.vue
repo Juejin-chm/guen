@@ -59,6 +59,11 @@
 				},
 			}
 		},
+		onLoad() {
+			this.$api('/my-team').then(({data}) => {
+				
+			})
+		},
 		methods: {
 			
 		}

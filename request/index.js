@@ -5,7 +5,7 @@ const defauls = {
 }
 const baseUrl = 'http://guen_czd.juejinvr.cn:8089/api'
 // 全局请求封装
-export default (path, data = {}, config = defauls) => {
+export default function (path, data = {}, config = defauls) {
 
 	const token = uni.getStorageSync("access_token");
 	const Authorization = token || "";
@@ -16,7 +16,6 @@ export default (path, data = {}, config = defauls) => {
 			mask: true
 		});
 	};
-
 	return new Promise((resolve, reject) => {
 		uni.request({
 			header: {
@@ -30,12 +29,14 @@ export default (path, data = {}, config = defauls) => {
 				const { code, msg } = response.data
 				if (code == 401) {
 					console.log('请先登录。。。')
+					reject()
 				}
 				if (code == 400) {
 					uni.showToast({
 						icon:"error",
 						title: msg
 					})
+					reject()
 				}
 				resolve(response.data);
 			},

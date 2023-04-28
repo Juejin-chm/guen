@@ -300,6 +300,11 @@
 				//普通用户申请角色未审核成功的，点击切换的角色时，跳出提醒“您还不是XXX，请申请认证”
 				if(hasAuth){
 					this.identity = index;
+					this.$api('/person-info', {
+						change_role: index + 1
+					}).then(({data}) => {
+						console.log(1234);
+					})
 				}else{
 					uni.showModal({
 						title: '提示',

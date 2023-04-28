@@ -34,7 +34,7 @@
 				</view>
 				
 				<view class="msgul">
-					<view class="msgli">
+					<view v-for="item in 5" :key="item" class="msgli">
 						<image src="../../static/image/head.png" mode=""></image>
 						<view>
 							<view>昵称</view>
@@ -42,7 +42,7 @@
 						<view class="time">2023/02/12 12:26:54</view>
 						<view class="num red">+11.00</view>
 					</view>
-					<view class="msgli">
+					<!-- <view class="msgli">
 						<image src="../../static/image/head.png" mode=""></image>
 						<view>
 							<view>昵称</view>
@@ -57,7 +57,7 @@
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
 						<view class="num red">+02.67</view>
-					</view>
+					</view> -->
 				</view>
 			</view>
 		</view>
@@ -76,6 +76,14 @@
 					isCenter:true,
 				},
 			}
+		},
+		onPullDownRefresh() {
+			console.log('refresh...');
+		},
+		onLoad() {
+			this.$api('/commission-list').then(({data}) => {
+				
+			})
 		},
 		methods: {
 			
