@@ -1,5 +1,15 @@
 {
-	"pages": [ 
+	"pages": [
+		{
+		    "path" : "pages/applyBox/applyBox",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "申请领取盒子",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		,
 		{
 			"path": "pages/my/my",
 			"style": {
@@ -7,6 +17,28 @@
 			}
 		}
 		    ,
+		{
+		    "path" : "pages/myCommission/myCommission",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "我的佣金",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		,
+		
+		{
+		    "path" : "pages/message/message",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "消息通知",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		,
+		
 		{
 		    "path" : "pages/applyDetail/applyDetail",
 		    "style" :                                                                                    
@@ -95,24 +127,6 @@
             
         }
         ,{
-            "path" : "pages/applyBox/applyBox",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "申请领取盒子",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/message/message",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "消息通知",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
             "path" : "pages/messageDetail/messageDetail",
             "style" :                                                                                    
             {
@@ -154,15 +168,6 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "消息通知",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/myCommission/myCommission",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "我的佣金",
                 "enablePullDownRefresh": false
             }
             

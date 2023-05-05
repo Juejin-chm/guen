@@ -4,8 +4,8 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view :class="[status==1?'cur':'']">订单通知</view>
-			<view :class="[status==2?'cur':'']">平台消息</view>
+			<view :class="[status==1?'cur':'']" @click="status = 1">订单通知</view>
+			<view :class="[status==2?'cur':'']" @click="status = 2">平台消息</view>
 		</view>
 		
 		<view class="box boxhui">
@@ -57,7 +57,7 @@
 			</view>
 		</view>
 		
-		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)">
+		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)" @close="close">
 			<view class="msgpop">
 				<view class="msgul">
 					<view class="msgli">
@@ -100,7 +100,15 @@
 				status:1, //1-订单通知  2-平台消息
 			}
 		},
+		onLoad() {
+			this.getList()
+		},
 		methods: {
+			getList(month) {
+				this.$api('/ggz-order-msg-list', {
+					search_month: month
+				})
+			},
 			cliPop(){
 				this.showPop = true
 			},
@@ -108,6 +116,9 @@
 				uni.navigateTo({
 					url:'../messageDetail/messageDetail'
 				})
+			},
+			close() {
+				this.showPop = false
 			}
 		}
 	}

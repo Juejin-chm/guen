@@ -4,17 +4,18 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view class="cur">全部</view>
-			<view>待投放</view>
+			<view v-for="item in tabs" :key="item.key" :class="{cur: item.key == curTab}" @click="tabChange(item.key)">{{item.value}}</view>
+			
+			<!-- <view>待投放</view>
 			<view>已投放</view>
-			<view>已结束</view>
+			<view>已结束</view> -->
 		</view>
 		<view class="box boxhui">
 			<view class="outer">
 				<view class="ex-name flex-between">
 					<view class="le">全部订单</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" :value='date' fields="month" @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -87,13 +88,37 @@
 					title:'投放订单',
 					hasRetun:true,
 					isCenter:true,
-					date:null,
 				},
+				tabs: [],
+				curTab: 'all',
+				date: undefined
 			}
 		},
+		onLoad(option) {
+			this.curTab = option.key
+			console.log(option, 'option');
+			this.$api('/order-const').then(({data}) => {
+				console.log(data, 'data');
+				this.tabs = data
+			})
+			this.getList(option.key)
+		},
 		methods: {
+			getList(status, month) {
+				this.$api('/order-list', {
+					search_status: status,
+					search_month: month
+				}).then(({data}) => {
+					console.log(data, '123data');
+				})
+			},
+			tabChange(key) {
+				this.curTab = key
+				this.getList(key, this.date)
+			},
 			bindDateChange(e){
 				this.date = e.detail.value;
+				this.getList(this.curTab, this.date)
 			},
 		}
 	}

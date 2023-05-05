@@ -14,7 +14,7 @@
 				<view class="ex-name flex-between">
 					<view class="le">全部审核</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -59,8 +59,9 @@
 					title:'我的申请',
 					hasRetun:true,
 					isCenter:true,
-					date:null,
+					
 				},
+				date:null,
 				tabs: [],
 				curTab: 'all',
 				reviewList: []
@@ -77,9 +78,10 @@
 		},
 		methods: {
 			async getList(status, month) {
+				
 				this.$api('/user-examine-list', {
 					status,
-					// search_month: month
+					search_month: month
 				}).then(({data}) => {
 					this.reviewList = data
 				})
@@ -87,6 +89,7 @@
 			bindDateChange(e){
 				console.log(e.detail.value)
 				this.date = e.detail.value;
+				this.getList(this.curTab, this.date)
 			},
 			tabClick(key) {
 				this.curTab = key

@@ -5,19 +5,19 @@
 		
 		<view class="nums">
 			<view>
-				<view class="b">541.00</view>
+				<view class="b">{{data.totalCommission}}</view>
 				<view>平台消息</view>
 			</view>
 		</view>
 		<view class="flex-between nums">
 			<view>
 				<view>可提取金额(元)</view>
-				<view class="b">531.00</view>
+				<view class="b">{{data.availableCommission}}</view>
 			</view>
 			<view>
 				<view>不可提取金额(元)</view>
-				<view class="b">10.00</view>
-				<view class="tip">注：需成交X天后才可提现</view>
+				<view class="b">{{data.freezeCommission}}</view>
+				<view class="tip">注：需成交{{'x'}}天后才可提现</view>
 			</view>
 		</view>
 		
@@ -75,6 +75,7 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				data: {}
 			}
 		},
 		onPullDownRefresh() {
@@ -82,7 +83,7 @@
 		},
 		onLoad() {
 			this.$api('/commission-list').then(({data}) => {
-				
+				this.data = data
 			})
 		},
 		methods: {

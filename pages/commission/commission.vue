@@ -4,8 +4,8 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view :class="[status==1?'cur':'']">佣金消息</view>
-			<view :class="[status==2?'cur':'']">平台消息</view>
+			<view :class="[status==1?'cur':'']" @click="status = 1">佣金消息</view>
+			<view :class="[status==2?'cur':'']" @click="status = 2">平台消息</view>
 		</view>
 		
 		<view class="box boxhui">
@@ -20,7 +20,7 @@
 						</template>
 					</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -28,7 +28,7 @@
 				</view>
 				
 				<view class="msgul" v-if="status==1">
-					<view class="msgli">
+					<view class="msgli" @click="cliPop">
 						<view>
 							<view>您有新的佣金收益消息</view>
 						</view>
@@ -76,7 +76,7 @@
 			</view>
 		</view>
 		
-		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)">
+		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)" @close="close">
 			<view class="msgpop">
 				<view class="msgul">
 					<view class="msgli">
@@ -87,7 +87,7 @@
 					</view>
 				</view>
 				<!-- 您有新的佣金提取消息: -->
-				<!-- <view class="cellbor cellbor-le">
+				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space spaceNum">
 							<view>已提取佣金<text> -￥541.25</text></view>
@@ -95,9 +95,9 @@
 							<view>不可提取佣金<text>￥241.12</text></view>
 						</view>
 					</van-cell-group>
-				</view> -->
+				</view>
 				<!-- 您有新的佣金收益消息: -->
-				<!-- <view class="cellbor cellbor-le">
+				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space spaceNum">
 							<view>收到佣金<text> +￥13.25</text></view>
@@ -105,7 +105,7 @@
 							<view>不可提取佣金<text>￥241.12</text></view>
 						</view>
 					</van-cell-group>
-				</view> -->
+				</view>
 				<!-- 您有新的下级成员加入: -->
 				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
@@ -134,9 +134,26 @@
 				},
 				showPop:false,
 				status:1, //1-佣金消息  2-平台消息
+				list: [],
+				detail: {},
+				date: ''
 			}
 		},
+		onLoad() {
+			this.getList()
+		},
 		methods: {
+			close() {
+				this.showPop = false
+			},
+			getList(month) {
+				this.$api('/tgds-msg-list', {
+					search_month: month
+				}).then(({data}) => {
+					console.log(data ,1111);
+					this.list = data.data
+				})
+			},
 			cliPop(){
 				this.showPop = true
 			},
@@ -144,6 +161,10 @@
 				uni.navigateTo({
 					url:'../messageDetail/messageDetail'
 				})
+			},
+			bindDateChange(e) {
+				this.date = e.detail.value
+				this.getList(this.date)
 			}
 		}
 	}

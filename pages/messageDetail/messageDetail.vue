@@ -1,8 +1,8 @@
 <template>
 	<view class="outer">
-		<view class="h">平台消息通知标题</view>
-		<view class="time">2023/02/12  10:25:36</view>
-		<view class="intro">内容描述</view>
+		<view class="h">{{detail.title}}</view>
+		<view class="time">{{detail.format_time}}</view>
+		<view class="intro" v-html="detail.cont"></view>
 	</view>
 </template>
 
@@ -10,8 +10,13 @@
 	export default {
 		data() {
 			return {
-				
+				detail: {}
 			}
+		},
+		onLoad(option) {
+			this.$api('/platform-message-info/' + option.id).then(({data}) => {
+				this.detail = data
+			})
 		},
 		methods: {
 			

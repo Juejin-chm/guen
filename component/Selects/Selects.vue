@@ -8,6 +8,7 @@
         <text @click.stop="handleRemove(null)"></text>
       </view>
       <!-- 显示框 -->
+			
       <view class="uni-select-multiple" v-show="realValue.length">
         <view class="uni-select-multiple-item" v-for="(item, index) in realValue" :key="index">
           {{ item }}
@@ -29,7 +30,7 @@
           :key="index"
           @click.stop="handleChange(index, item)"
         >
-          {{ item.label }}
+          {{ item.goods_name }}
         </view>
       </template>
     </scroll-view>
@@ -136,6 +137,7 @@ export default {
     },
     // 点击组件列
     handleChange(index, item) {
+			console.log(item, 111111);
       const arrIndex = this.realValue.indexOf(item[this.svalue]);
       if (arrIndex > -1) {
         this.changevalue.splice(arrIndex, 1);

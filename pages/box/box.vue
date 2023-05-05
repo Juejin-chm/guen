@@ -4,10 +4,10 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view class="cur">全部</view>
-			<view>未派送</view>
+			<view v-for="item in tabs" :key="item.key" :class="{cur: item.key === curTab}" @click="tabChange(item.key)">{{ item.value }}</view>
+	<!-- 		<view>未派送</view>
 			<view>已派送</view>
-			<view>已完成</view>
+			<view>已完成</view> -->
 		</view>
 		<view class="box boxhui">
 			<view class="outer">
@@ -88,7 +88,6 @@
 						</view>
 				    </van-cell-group>
 				</view>
-				
 			</view>
 		</view>
 	</view>
@@ -104,13 +103,30 @@
 					isCenter:true,
 					date:null,
 				},
+				tabs: [],
+				curTab: 'all'
 			}
 		},
+		onLoad(option) {
+			this.$api('/box-order-transport-status').then(({data}) => {
+				this.tabs = data
+			})
+		},
 		methods: {
+			getList(status, month) {
+				this.$api('/box-order-list', {
+					search_status: status,
+					search_month: month
+				})
+			},
 			bindDateChange(e){
 				console.log(e.detail.value)
 				this.date = e.detail.value;
 			},
+			tabChange(key) {
+				this.curTab = key
+				this.getList(key)
+			}
 		}
 	}
 </script>

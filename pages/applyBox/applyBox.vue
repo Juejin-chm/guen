@@ -4,7 +4,7 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<van-cell-group inset class="v-group" :border='false'>
-			<van-cell class='h' title="门店" value="XXXXXX门店名称"/>
+			<van-cell class='h' title="门店" :value="boxInfo.company"/>
 			<view class="boxChoose">
 				<van-cell :border='false' @click="showChoose">
 					<view slot="title" class="title">选择盒子类型<text>（可多选）</text></view>
@@ -13,15 +13,16 @@
 						<image src="../../static/image/turn-right.png"></image>
 					</view>
 				</van-cell>
+				
 				<view class="lists">
 					<view class="listcon">
-						<template v-for="item in list">
-							<view class="list" v-for="(subit,subin) in item.child" :key='item.value' >
+						<template v-for="(value, key) in checkedBox">
+							<view class="list" v-for="(subit,subin) in value" :key='key' >
 								<view>
-									<text :style="{'opacity':subin==0?'1':'0'}">{{item.label}}：</text>
-									<text>{{subit.label}}</text>
+									<text :style="{'opacity':subin==0?'1':'0'}">{{cateNameList[key]}}：</text>
+									<text>{{delId(subit)}}</text>
 								</view>
-								<input type="number" placeholder="填写数量">
+								<input type="number" placeholder="填写数量" :value="boxNumber[key]" @input="(e) => inputChange(e, key)">
 								<view class="close">
 									<image src="../../static/image/close.png" mode=""></image>
 								</view>
@@ -34,7 +35,7 @@
 			<van-field label="收货人" placeholder="请输入"  />
 			<van-field label="联系电话" placeholder="请输入" />
 			<van-cell title="收货地址" is-link :border='false'>
-				<picker mode='region' @change="bindPickerChange">
+				<picker mode='region' @change="pickerCityChange">
 					<view :class="pickerValue?'value':''">{{pickerValue?pickerValue:'请选择省/市/区'}}</view>
 				</picker>
 			</van-cell>
@@ -62,24 +63,46 @@
 			<view class="choosepop">
 				<form @submit="formSubmit">
 					<view class="h">选择盒子</view>
-					<view class="sign">已选：<text>500方盒；650方盒；320正方盒</text></view>
+					<view class="sign">已选：<text>{{compCheckedBox.join('; ')}}</text></view>
 					<view class="h5">选择系列</view>
 					<view class="picker">
-						<picker @change="bindPickerChange" :value="index" :range="list" range-key="label">
-							<input type="text" disabled placeholder="请选择" :value="list[index].label">
+						<picker @change="bindPickerChange" :value="index" :range="boxInfo.orderGoodsCate" range-key="cate_name">
+							<input type="text" disabled placeholder="请选择" :value="boxInfo.orderGoodsCate[index].cate_name">
 							<image src="../../static/image/turn-right.png"></image>
 						</picker>
 					</view>
 					
-					<view class="h5">选择系列</view>
-					<select-lay 
+					<view class="h5">选择盒子</view>
+					<!-- <select-lay 
 						:value="tval" 
 						name="name" 
 						:options="datalist" 
 						@selectitem="selectitem"
-						>
-					</select-lay>
-					<button class="btn" form-type="submit" style="margin-top: 30rpx;">确认</button>
+					/> -->
+					<template>
+						<!-- 下拉 input 框 -->
+						<view class="selector-input" @click="SVShow = !SVShow">{{ compCheckedBox.length ? compCheckedBox.join() : '请选择' }}</view>
+						<scroll-view v-show="SVShow" :scroll-y="true" class="scroll-view">
+						  <template>
+						    <!-- <view
+									class="sv-item"
+						      v-for="(item, index) in cateBoxes"
+						      :key="index"
+						    >
+						      {{ item.goods_name }}
+						    </view> -->
+											<checkbox-group @change="checkboxChange">
+												<label class="uni-list-cell uni-list-cell-pd" v-for="item in cateBoxes" :key="item.goods_id">
+													<view>
+														<checkbox color="#cba868" :value="`${item.goods_name}-${item.order_goods_id}`" :checked="item.checked" style="transform: scale(0.7);" />
+													</view>
+													<view>{{item.goods_name}}</view>
+												</label>
+											</checkbox-group>
+						  </template>
+						</scroll-view>
+					</template>
+					<button class="btn" form-type="submit" style="margin-top: 30rpx;" @click="confirm">确认</button>
 				</form>
 			</view>
 		</van-popup>
@@ -93,6 +116,7 @@
 	export default {
 		data() {
 			return {
+				SVShow: false,
 				barConfig: {
 					title:'申请领取盒子',
 					hasRetun:true,
@@ -101,40 +125,92 @@
 				show: false,
 				//模拟数据列表
 				index:null,
-				list: [{
-					id:1,
-					label: '方盒系列',
-					child:[{
-							label: '500方盒',
-							value: '500方盒'
-						},{
-							label: '650方盒',
-							value: '650方盒'
-						}
-					]},
-				{	
-					id:2,
-					label: '正方盒系列',
-					child:[
-						{
-							label: '320正方盒',
-							value: '320正方盒'
-						},{
-							label: '650正方盒',
-							value: '650正方盒'
-						}
-					]
-				}],
+				// list: [{
+				// 	id:1,
+				// 	label: '方盒系列',
+				// 	child:[{
+				// 			label: '500方盒',
+				// 			value: '500方盒'
+				// 		},{
+				// 			label: '650方盒',
+				// 			value: '650方盒'
+				// 		}
+				// 	]},
+				// {	
+				// 	id:2,
+				// 	label: '正方盒系列',
+				// 	child:[
+				// 		{
+				// 			label: '320正方盒',
+				// 			value: '320正方盒'
+				// 		},{
+				// 			label: '650正方盒',
+				// 			value: '650正方盒'
+				// 		}
+				// 	]
+				// }],
 				datalist:[],
 				//模拟初始数据
-				tval: []
+				tval: [],
+				
+				boxInfo: {},
+				cateBoxes: [], // 传了分类id之后的盒子列表
+				checkedBox: {}, // 选中的分类盒子
+				cateNameList: {}, //维护一个分类名字列表, key 和checkedBox 的 key 对应
+				boxNumber: {}
 			}
 		},
+		computed: {
+			compCheckedBox() {
+				console.log(Object.values(this.checkedBox).flat(2), '------------');
+				return Object.values(this.checkedBox).flat(2).map(item => this.delId(item)) || []
+			}
+		},
+		onLoad() {
+			this.$api('/bus-order-show').then(({data}) => {
+				this.boxInfo = data
+			})
+		},
 		methods: {
+			inputChange(e, key) {
+				this.boxNumber[key] = e.detail.value
+			},
+			delId(str, isKey) {
+				const res = str.split('-')
+				return isKey ? res[1] : res[0]
+			},
+			confirm() {
+				this.show = false
+			},
+			checkboxChange(e) {
+				console.log('checkbox change..', e);
+				const checkeds = e.detail.value
+				this.$set(this.checkedBox, this.index, checkeds)
+				
+				console.log(this.checkedBox,this.cateNameList,  'checkedBox');	
+			},
+			getCateboxes(cate_id) {
+				this.$api('/search-goods-by-cate', { cate_id }).then(({data}) => {
+					this.cateBoxes = data.map(item => {
+						// 如果之前已经有选中，则保持选中
+						this.checkedBox[this.index]?.includes(item.goods_name+ `-${item.order_goods_id}`) && (item.checked = true)
+						return item
+					})
+					console.log(this.cateBoxes, 'ew')
+				})
+			},
 			bindPickerChange(e){
 				let index = e.detail.value
 				this.index = index;
-				this.datalist = this.list[index].child;
+				
+				this.cateNameList[index] = this.boxInfo.orderGoodsCate[index].cate_name
+				
+				this.getCateboxes(this.boxInfo.orderGoodsCate[index].cate_id)
+				this.datalist = this.cateBoxes
+			},
+			pickerCityChange(e) {
+				console.log(e, 'aaaaaaaaaaa');
+				this.pickerValue = e.detail.value
 			},
 			formSubmit(e) {
 				console.log(e)
@@ -157,6 +233,28 @@
 	page{background-color:#f9f9f9;}
 </style>
 <style scoped lang="less">
+	.uni-list-cell {
+		justify-content: flex-start;
+		display: flex;
+		align-items: center;
+	}
+	.sv-item {
+		margin: 10rpx 0;
+	}
+	.selector-input {
+		min-height: 68rpx;
+		border: 1px solid #e2e2e2;
+		display: flex;
+		align-items: center;
+		padding: 0 30px 0 10px;
+	}
+	.scroll-view {
+		border: 1px solid #e2e2e2;
+		margin: 14rpx 0;
+		height: 200rpx;
+		padding: 10rpx;
+		box-sizing: border-box;
+	}
 	/deep/ .v-group{padding: 11rpx 0;
 		display: block;
 		.van-field__label{color: #111;}

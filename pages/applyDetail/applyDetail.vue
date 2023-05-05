@@ -16,7 +16,7 @@
 			</view>
 			<view class='cellbor' v-if="detail.status==2">
 				<van-cell-group :border="false">
-					<van-cell class='msg' :border="false" :value='detail.refund_reason'></van-cell>
+					<van-cell class='msg' :border="false" :value='detail.refund_reason || "（空）"'></van-cell>
 				</van-cell-group>
 			</view>
 			

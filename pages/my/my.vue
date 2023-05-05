@@ -15,21 +15,21 @@
 						<view class="ul" v-if="identity>0">
 							<view class="li" v-if="identity==1">
 								<image src="@/static/image/n1.png"></image>
-								<text>XXXXXX门店名称</text>
+								<text>{{user.role_info.bus_store_name}}</text>
 							</view>
 							<template v-if="identity==2">
 								<view class="li">
 									<image src="@/static/image/n1.png"></image>
-									<text>真实姓名</text>
+									<text>{{ user.role_info.name }}</text>
 								</view>
 								<view class="li">
 									<image src="@/static/image/n2.png"></image>
-									<text>厦门公司xxxxxxx</text>
+									<text>{{user.role_info.ds_plug_addr}}</text>
 								</view>
 							</template>
 							<view class="li" v-if="identity==3">
 								<image src="@/static/image/n3.png"></image>
-								<text>广告主公司名称xxxxxxx</text>
+								<text>{{user.role_info.ds_plug_addr}}</text>
 							</view>
 						</view>
 					</view>
@@ -74,11 +74,11 @@
 						<view class="columns">
 							<view class="column-li">
 								<view>总盒子数量</view>
-								<view class="b">26541</view>
+								<view class="b">{{user.total_box_num}}</view>
 							</view>
 							<view class="column-li">
 								<view>本月盒子剩余数量</view>
-								<view class="b">541</view>
+								<view class="b">{{ user.month_box_num }}</view>
 							</view>
 						</view>
 					</view>
@@ -109,11 +109,11 @@
 						<view class="flex-between">
 							<view>
 								<view>可提取</view>
-								<view class="b">541.25</view>
+								<view class="b">{{user.money}}</view>
 							</view>
 							<view>
 								<view>不可提取</view>
-								<view class="b">241.12</view>
+								<view class="b">{{user.frozen_money}}</view>
 							</view>
 						</view>
 						<image class="ico ico2" src="@/static/image/column2.png"></image>
@@ -138,29 +138,29 @@
 					<view class="column">
 						<view class="column-li column-2">
 							<view>曝光度</view>
-							<view class="b">23642</view>
+							<view class="b">{{user.exposure}}</view>
 							<image class="ico ico3" src="@/static/image/column3.png"></image>
 						</view>
 					</view>
 					
 					<view class="mh">投放订单状态</view>
 					<view class="mul">
-						<navigator hover-class="none" url="../order/order">
-							<image src="../../static/image/order1.png"></image>
-							<view>全部订单</view>
+						<navigator v-for="item in orderList" hover-class="none" :key="item.key" :url="`../order/order?key=${item.key}`">
+							<image :src="item.src"></image>
+							<view>{{item.value}}</view>
 						</navigator>
-						<navigator hover-class="none" url="../order/order">
+						<!-- <navigator hover-class="none" url="../order/order?id=1">
 							<image src="../../static/image/order2.png"></image>
 							<view>未派送</view>
 						</navigator>
-						<navigator hover-class="none" url="../order/order">
+						<navigator hover-class="none" url="../order/order?id=2">
 							<image src="../../static/image/order3.png"></image>
 							<view>已派送</view>
 						</navigator>
-						<navigator hover-class="none" url="../order/order">
+						<navigator hover-class="none" url="../order/order?id=3">
 							<image src="../../static/image/order4.png"></image>
 							<view>已结束</view>
-						</navigator>
+						</navigator> -->
 					</view>
 				</template>
 				
@@ -185,17 +185,17 @@
 					<navigator url="../message/message" hover-class="none" v-if="identity==0||identity==1">
 						<image src="../../static/image/mo2.png"></image>
 						<view>消息通知</view>
-						<text class="num">3</text>
+						<text v-if="user.no_read_msg_count" class="num">{{user.no_read_msg_count}}</text>
 					</navigator>
 					<navigator url="../commission/commission" hover-class="none" v-if="identity==2">
 						<image src="../../static/image/mo2.png"></image>
 						<view>消息通知</view>
-						<text class="num">3</text>
+						<text v-if="user.no_read_msg_count" class="num">{{user.no_read_msg_count}}</text>
 					</navigator>
 					<navigator url="../orderNotic/orderNotic" hover-class="none" v-if="identity==3">
 						<image src="../../static/image/mo2.png"></image>
 						<view>消息通知</view>
-						<text class="num">3</text>
+						<text v-if="user.no_read_msg_count" class="num">{{user.no_read_msg_count}}</text>
 					</navigator>
 				</view>
 				
@@ -259,13 +259,18 @@
 				nickname: uni.getStorageSync('nickname'),
 				access_token: uni.getStorageSync('access_token'),
 				showAuth:false,
+				
+				user: {
+					role_info: {}
+				},
+				orderList: []
 			}
 		},
 		onLoad() {
 			this.$api('/role-list').then(({data}) => {
-				this.idenArr[0].hasAuth = data[1].has_role || true
-				this.idenArr[1].hasAuth = data[2].has_role || true
-				this.idenArr[2].hasAuth = data[3].has_role || true
+				this.idenArr[0].hasAuth = data[1].has_role
+				this.idenArr[1].hasAuth = data[2].has_role
+				this.idenArr[2].hasAuth = data[3].has_role
 			})
 		},
 		methods: {
@@ -303,7 +308,13 @@
 					this.$api('/person-info', {
 						change_role: index + 1
 					}).then(({data}) => {
-						console.log(1234);
+						this.user = data.user
+						if (data.user.order_const) {
+						 this.orderList = data.user.order_const.map((item, index) => {
+							 item.src = `../../static/image/order${index + 1}.png`
+							 return item
+						 })
+						}
 					})
 				}else{
 					uni.showModal({

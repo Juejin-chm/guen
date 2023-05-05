@@ -17,6 +17,7 @@ export default function (path, data = {}, config = defauls) {
 		});
 	};
 	return new Promise((resolve, reject) => {
+		data = JSON.parse(JSON.stringify(data))
 		uni.request({
 			header: {
 				Authorization,

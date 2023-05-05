@@ -4,8 +4,8 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view :class="[status==1?'cur':'']">审核通知</view>
-			<view :class="[status==2?'cur':'']">平台消息</view>
+			<view :class="[status==1?'cur':'']" @click="clickTab(1)">审核通知</view>
+			<view :class="[status==2?'cur':'']" @click="clickTab(2)">平台消息</view>
 		</view>
 		
 		<view class="box boxhui">
@@ -13,16 +13,16 @@
 				<view class="ex-name flex-between ex-nameul">
 					<view class="le">
 						<template v-if="status==1">
-							<view class="act">全部</view>
-							<view>已通过</view>
-							<view>驳回</view>
+							<view v-for="(item, index) in ['全部', '已通过', '驳回']" :key="item" :class="{ act: tabIndex === index }" @click="tabIndex = index">{{item}}</view>
+							<!-- <view>已通过</view>
+							<view>驳回</view> -->
 						</template>
 						<template v-else>
 							<view>平台消息</view>
 						</template>
 					</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -30,13 +30,13 @@
 				</view>
 				
 				<view class="msgul" v-if="status==1">
-					<view class="msgli" @tap="cliPop">
+					<view v-for="item in msgList" class="msgli" :key="item.id" @tap="cliPop(item.id)">
 						<view>
 							<view class="dot">申领盒子审核<text class="green">（通过）</text></view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
 					</view>
-					<view class="msgli" @tap="cliPop">
+					<!-- <view class="msgli" @tap="cliPop">
 						<view>
 							<view class="dot">申领盒子审核<text class="red">（驳回）</text></view>
 						</view>
@@ -47,39 +47,39 @@
 							<view>申领盒子审核<text class="red">（通过）</text></view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
-					</view>
+					</view> -->
 				</view>
 				<view class="msgul" v-else>
-					<view class="msgli" @tap="goDetail">
+					<!-- <view class="msgli" @tap="goDetail">
 						<view>
 							<view class="dot">平台消息通知标题</view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
-					</view>
-					<view class="msgli" @tap="goDetail">
+					</view> -->
+					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view class="gold">成为推广大使审核通过消息</view>
+							<view :class="[item.isread ? 'gold' : 'red']">{{item.title}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{item.format_time}}</view>
 					</view>
-					<view class="msgli" @tap="goDetail">
+					<!-- <view class="msgli" @tap="goDetail">
 						<view>
 							<view class="gold">成为广告主审核驳回消息</view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
-					</view>
+					</view> -->
 				</view>
 			</view>
 		</view>
 		
-		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)">
+		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)" @close="onClose">
 			<view class="msgpop">
 				<view class="msgul">
 					<view class="msgli">
 						<view>
-							<view>申领盒子审核<text class="red">（驳回）</text></view>
+							<view>{{detailData.title}}<text class="red">（驳回）</text></view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{detailData.format_time}}</view>
 					</view>
 				</view>
 				<view class="cellbor cellbor-le">
@@ -114,19 +114,48 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				date: '',
+				tabIndex: 0,
 				showPop:false,
-				status:1, //1-审核通知  2-平台消息
+				status:2, //1-审核通知  2-平台消息
+				msgList: [],
+				detailData: {}
 			}
 		},
+		onLoad() {
+			this.getList()
+		},
 		methods: {
-			cliPop(){
-				this.showPop = true
+			onClose() {
+				this.showPop = false
 			},
-			goDetail(){
-				uni.navigateTo({
-					url:'../messageDetail/messageDetail'
+			getList(month) {
+				this.$api('/platform-message-list').then(({data}) => {
+					console.log(data.data, 'data');
+					this.msgList = data.data
 				})
-			}
+			},
+			cliPop(id){
+				this.showPop = true
+				this.$api('/platform-message-info/' + id).then(({data}) => {
+					this.detailData = data
+				})
+			},
+			goDetail(id){
+				uni.navigateTo({
+					url:'../messageDetail/messageDetail?id=' + id
+				})
+			},
+			bindDateChange(e) {
+				this.date = e.detail.value
+				this.getList(this.date)
+			},
+			clickTab(v) {
+				this.status = v
+				if (v === 2) {
+					this.getList()
+				}
+			} 
 		}
 	}
 </script>
