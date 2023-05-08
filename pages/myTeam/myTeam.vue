@@ -8,7 +8,7 @@
 				<view class="ex-name flex-between">
 					<view class="le">团队列表</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" :value='date' fields="month" @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -16,30 +16,15 @@
 				</view>
 				
 				<view class="msgul">
-					<view class="msgli">
-						<image src="../../static/image/head.png" mode=""></image>
+					<view v-for="item in data.data" :key="item.id" class="msgli">
+						<image :src="item.avatar" mode=""></image>
 						<view>
-							<view>昵称</view>
+							<view>{{item.name}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-						<view class="num red">+134.25</view>
+						<view class="time">{{item.format_time}}</view>
+						<view class="num red">+{{item.total_commsion}}</view>
 					</view>
-					<view class="msgli">
-						<image src="../../static/image/head.png" mode=""></image>
-						<view>
-							<view>昵称</view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-						<view class="num red">+134.25</view>
-					</view>
-					<view class="msgli">
-						<image src="../../static/image/head.png" mode=""></image>
-						<view>
-							<view>昵称</view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-						<view class="num red">+134.25</view>
-					</view>
+					
 				</view>
 			</view>
 		</view>
@@ -57,15 +42,23 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				data: {},
+				date: ''
 			}
 		},
 		onLoad() {
-			this.$api('/my-team').then(({data}) => {
-				
-			})
+			this.getList()
 		},
 		methods: {
-			
+			getList(search_month) {
+				this.$api('/my-team', {search_month}).then(({data}) => {
+					this.data = data
+				})
+			},
+			bindDateChange(e) {
+				this.date = e.detail.value
+				this.getList(this.date)
+			}
 		}
 	}
 </script>

@@ -29,7 +29,7 @@
 							</template>
 							<view class="li" v-if="identity==3">
 								<image src="@/static/image/n3.png"></image>
-								<text>{{user.role_info.ds_plug_addr}}</text>
+								<text>{{user.role_info.ggz_company}}</text>
 							</view>
 						</view>
 					</view>
@@ -166,7 +166,7 @@
 				
 				<view class="mh">其他</view>
 				<view class="mul mulsma">
-					<view v-if="identity!=3">
+					<view v-if="identity!=3" @click="goBusiness">
 						<image src="../../static/image/mo1.png"></image>
 						<view>我要推广</view>
 					</view>
@@ -174,11 +174,11 @@
 						<image src="../../static/image/mo3.png"></image>
 						<view>发放记录</view>
 					</navigator>
-					<view v-if="identity==2">
+					<view v-if="identity==2" @click="push">
 						<image src="../../static/image/mo4.png"></image>
 						<view>推广海报</view>
 					</view>
-					<view v-if="identity==3">
+					<view v-if="identity==3" @click="goDiscount">
 						<image src="../../static/image/mo5.png"></image>
 						<view>投放套餐</view>
 					</view>
@@ -274,6 +274,22 @@
 			})
 		},
 		methods: {
+			goBusiness() {
+				uni.navigateTo({
+					url:'/pages/business/business'
+				})
+			},
+			goDiscount() {
+				uni.navigateTo({
+					url:'/pages/discount/discount'
+				})
+			},
+			push() {
+				// this.$api('/user-share-page')
+				uni.navigateTo({
+					url: '/pages/poster/poster'
+				})
+			},
 			blur(e) {
 				const { value: nickname } = e.detail
 				uni.setStorageSync('nickname', nickname)

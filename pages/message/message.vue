@@ -13,7 +13,7 @@
 				<view class="ex-name flex-between ex-nameul">
 					<view class="le">
 						<template v-if="status==1">
-							<view v-for="(item, index) in ['全部', '已通过', '驳回']" :key="item" :class="{ act: tabIndex === index }" @click="tabIndex = index">{{item}}</view>
+							<view v-for="(item, index) in applyTab" :key="item.key" :class="{ act: tabIndex == item.key }" @click="applyTabClick(item.key)">{{item.value}}</view>
 							<!-- <view>已通过</view>
 							<view>驳回</view> -->
 						</template>
@@ -28,13 +28,13 @@
 						</picker>
 					</view>
 				</view>
-				
+				<!-- 审核通知 -->
 				<view class="msgul" v-if="status==1">
-					<view v-for="item in msgList" class="msgli" :key="item.id" @tap="cliPop(item.id)">
+					<view v-for="item in applyList" class="msgli" :key="item.id" @tap="cliPop(item.id)">
 						<view>
-							<view class="dot">申领盒子审核<text class="green">（通过）</text></view>
+							<view :class="{dot: item.is_read}">{{item.title}}<text :class="{green: item.status == 2, red: item.status == 3}">（{{item.status == 2 ? '通过' : '驳回'}}）</text></view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{item.format_time}}</view>
 					</view>
 					<!-- <view class="msgli" @tap="cliPop">
 						<view>
@@ -49,6 +49,7 @@
 						<view class="time">2023/02/12 12:26:54</view>
 					</view> -->
 				</view>
+				<!-- 平台消息 -->
 				<view class="msgul" v-else>
 					<!-- <view class="msgli" @tap="goDetail">
 						<view>
@@ -77,7 +78,7 @@
 				<view class="msgul">
 					<view class="msgli">
 						<view>
-							<view>{{detailData.title}}<text class="red">（驳回）</text></view>
+							<view>{{detailData.title}}<text :class="[detailData.status === 2 ? 'green' : 'red']">（{{detailData.status_txt}})</text></view>
 						</view>
 						<view class="time">{{detailData.format_time}}</view>
 					</view>
@@ -86,15 +87,14 @@
 					<van-cell-group :border="false">
 						<view class="space">
 							<van-cell title="盒子类型：" :border='false'>
-								<view>
-									500方盒 &nbsp&nbsp&nbsp&nbsp 500个<br/>
-									320正方盒 &nbsp&nbsp&nbsp&nbsp 500个<br/>
+								<view v-for="item in detailData.box_info" :key="item.id">
+									{{item.title}}&nbsp;&nbsp;{{item.number}}个
 								</view>
 							</van-cell>
-							<van-cell title="申请日期：" :border='false' value="2023/01/25"/>
-							<van-cell title="申请原因：" :border='false' value="申请原因描述申请原因描述申请原因描述申请原因描述申请原因描述"/>
-							<van-cell title="驳回原因：" :border='false'>
-								<view class="red">驳回原因描述</view>
+							<van-cell title="申请日期：" :border='false' :value="detailData.date"/>
+							<van-cell title="申请原因：" :border='false' :value="detailData.remark"/>
+							<van-cell title="驳回原因：" v-if="detailData.status != 2" :border='false'>
+								<view class="red">{{ detailData.refund_reason }}</view>
 							</van-cell>
 						</view>
 					</van-cell-group>
@@ -114,32 +114,54 @@
 					hasRetun:true,
 					isCenter:true,
 				},
-				date: '',
-				tabIndex: 0,
+				date: null,
+				tabIndex: 'all',
 				showPop:false,
-				status:2, //1-审核通知  2-平台消息
+				status:1, //1-审核通知  2-平台消息
 				msgList: [],
-				detailData: {}
+				detailData: {},
+				applyList: [],
+				applyTab: []
 			}
 		},
 		onLoad() {
-			this.getList()
+			this.getApplyList()
+			this.$api('/box-order-msg-status').then(({data}) => {
+				this.applyTab = data
+			})
 		},
 		methods: {
+			applyTabClick(key) {
+				console.log(key, 'key')
+				this.tabIndex = key
+				this.getApplyList(this.date, key)
+			},
 			onClose() {
 				this.showPop = false
 			},
-			getList(month) {
-				this.$api('/platform-message-list').then(({data}) => {
-					console.log(data.data, 'data');
+			// 审核通知
+			getApplyList(search_month = this.date, search_status) {
+				this.$api('/box-order-msg-list', {search_month, search_status}).then(({data}) => {
+					this.applyList = data.data
+				})
+			},
+			// 平台消息
+			getList(search_month) {
+				this.$api('/platform-message-list', {search_month}).then(({data}) => {
 					this.msgList = data.data
 				})
 			},
 			cliPop(id){
-				this.showPop = true
-				this.$api('/platform-message-info/' + id).then(({data}) => {
-					this.detailData = data
-				})
+				if (this.status == 1) {
+					this.showPop = true
+					this.$api('/box-order-msg-info/' + id).then(({data}) => {
+						this.detailData = data
+					})
+				} else {
+					this.$api('/platform-message-info/' + id).then(({data}) => {
+						this.detailData = data
+					})
+				}
 			},
 			goDetail(id){
 				uni.navigateTo({
@@ -148,12 +170,19 @@
 			},
 			bindDateChange(e) {
 				this.date = e.detail.value
-				this.getList(this.date)
+				if (this.status == 1) {
+					this.getApplyList(this.date)
+				} else {
+					this.getList(this.date)
+				}
 			},
 			clickTab(v) {
 				this.status = v
 				if (v === 2) {
 					this.getList()
+				}
+				if (v === 1) {
+					this.getApplyList()
 				}
 			} 
 		}

@@ -4,8 +4,8 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view :class="[status==1?'cur':'']" @click="status = 1">订单通知</view>
-			<view :class="[status==2?'cur':'']" @click="status = 2">平台消息</view>
+			<view :class="[status==1?'cur':'']" @click="tabClick(1)">订单通知</view>
+			<view :class="[status==2?'cur':'']" @click="tabClick(2)">平台消息</view>
 		</view>
 		
 		<view class="box boxhui">
@@ -21,27 +21,27 @@
 				</view>
 				
 				<view class="msgul" v-if="status==1">
-					<view class="msgli" @tap="cliPop">
+					<view v-for="item in list" class="msgli" @tap="cliPop(item.id)">
 						<view>
-							<view class="dot">您有新的订单通知</view>
+							<view :class="{dot: !item.isread}">{{item.title}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{item.format_time}}</view>
 					</view>
-					<view class="msgli" @tap="cliPop">
+					<!-- <view class="msgli" @tap="cliPop">
 						<view>
 							<view>您有新的订单通知</view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
-					</view>
+					</view> -->
 				</view>
 				<view class="msgul" v-else>
-					<view class="msgli" @tap="goDetail">
+					<view v-for="item in msgList" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view class="dot">平台消息通知标题</view>
+							<view :class="{dot: !item.isread}">{{item.title}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{item.format_time}}</view>
 					</view>
-					<view class="msgli" @tap="goDetail">
+					<!-- <view class="msgli" @tap="goDetail">
 						<view>
 							<view class="gold">成为推广大使审核通过消息</view>
 						</view>
@@ -52,7 +52,7 @@
 							<view class="gold">成为广告主审核驳回消息</view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
-					</view>
+					</view> -->
 				</view>
 			</view>
 		</view>
@@ -98,23 +98,40 @@
 				},
 				showPop:false,
 				status:1, //1-订单通知  2-平台消息
+				list: [],
+				msgList: []
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
 		methods: {
-			getList(month) {
+			tabClick(v) {
+				this.status = v
+				if (v == 1) {
+					this.getList()
+				} else {
+					this.getMsgList()
+				}
+			},
+			getMsgList(search_month) {
+				this.$api('/platform-message-list', {search_month}).then(({data}) => {
+					this.msgList = data.data
+				})
+			},
+			getList(search_month) {
 				this.$api('/ggz-order-msg-list', {
-					search_month: month
+					search_month
+				}).then(({data}) => {
+					this.list = data.data
 				})
 			},
 			cliPop(){
 				this.showPop = true
 			},
-			goDetail(){
+			goDetail(id){
 				uni.navigateTo({
-					url:'../messageDetail/messageDetail'
+					url:'../messageDetail/messageDetail?id=' + id
 				})
 			},
 			close() {

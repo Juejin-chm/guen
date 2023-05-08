@@ -4,6 +4,15 @@ const defauls = {
 	loading: true
 }
 const baseUrl = 'http://guen_czd.juejinvr.cn:8089/api'
+
+function hideLoading(msg) {
+	uni.hideLoading();
+	uni.showToast({
+		icon:"error",
+		title: msg
+	})
+}
+
 // 全局请求封装
 export default function (path, data = {}, config = defauls) {
 
@@ -17,11 +26,11 @@ export default function (path, data = {}, config = defauls) {
 		});
 	};
 	return new Promise((resolve, reject) => {
-		data = JSON.parse(JSON.stringify(data))
+		data = JSON.stringify(data)
 		uni.request({
 			header: {
 				Authorization,
-				'Content-Type': 'application/x-www-form-urlencoded'
+				'Content-Type': 'application/json'
 			},
 			url: baseUrl + path,
 			method: config.method,
@@ -29,14 +38,15 @@ export default function (path, data = {}, config = defauls) {
 			success(response) {
 				const { code, msg } = response.data
 				if (code == 401) {
-					console.log('请先登录。。。')
-					reject()
+					hideLoading('请先登录')
+					reject('请先登录')
 				}
 				if (code == 400) {
-					uni.showToast({
-						icon:"error",
-						title: msg
-					})
+					hideLoading(msg)
+					reject()
+				}
+				if (code != 200) {
+					hideLoading(msg)
 					reject()
 				}
 				resolve(response.data);

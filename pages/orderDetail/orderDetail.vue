@@ -6,14 +6,14 @@
 		<view class="outer">
 			<view class="status">
 				<image src="@/static/image/exa3.png"></image>
-				<text>订单已投放</text>
+				<text>{{detail.format_status}}</text>
 			</view>
 			
 			<view class='cellbor address'>
-				<view class="h">广告主公司名称xxxxxxx<text>15786542369</text></view>
+				<view class="h">{{detail.user.ggz_company}}<text>{{detail.user.phone}}</text></view>
 				<view>
 					<image src="@/static/image/address.png"></image>
-					<text>福建省厦门市湖里区高新技术园1108号</text>
+					<text>{{detail.user.address}}</text>
 				</view>
 			</view>
 			
@@ -22,17 +22,17 @@
 					<van-cell class='h' title="套餐一信息"></van-cell>
 					<view class="space">
 						<van-cell title="价格：" :border="false">
-							<view style="color: #ff5050;">￥2000</view>
+							<view style="color: #ff5050;">￥{{detail.money}}</view>
 						</van-cell>
-						<van-cell title="盒子总数量" value="10000" :border="false" />
+						<van-cell title="盒子总数量" :value="detail.number" :border="false" />
 						<van-cell title="盒子类型" :border="false" >
-							<view>
-								650方盒：5000个<br/>
-								320正方盒：5000个<br/>
+							<view v-for="it in detail.goods" :key="it.id">
+								{{it.goods_title}}: {{it.number}}个<br/>
+								
 							</view>
 						</van-cell>
-						<van-cell title="投放周期" value="1年" :border="false" />
-						<van-cell title="投放开始-结束" value="2023/01/01-2023/12/31" :border="false" />
+						<van-cell title="投放周期" :value="detail.period" :border="false" />
+						<van-cell title="投放开始-结束" :value="detail.format_period" :border="false" />
 					</view>
 				</van-cell-group>
 			</view>
@@ -40,14 +40,14 @@
 				<van-cell-group :border="false">
 					<van-cell class='h' title="订单信息"></van-cell>
 					<view class="space">
-						<van-cell title="订单号" value="4455336" :border="false" />
-						<van-cell title="下单日期" value="2023/02/24" :border="false" />
+						<van-cell title="订单号" :value="detail.order_sn" :border="false" />
+						<van-cell title="下单日期" :value="detail.format_publish_date" :border="false" />
 					</view>
 				</van-cell-group>
 			</view>
 			<view class='cellbor'>
 				<van-cell-group :border="false">
-					<van-cell class="tel" title="电话咨询" value="1545662245" :border="false" >
+					<van-cell class="tel" title="电话咨询" :value="detail.phone" :border="false" >
 						<view slot="right-icon">
 							<image src="../../static/image/tel.png" mode=""></image>
 						</view>
@@ -68,9 +68,13 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				detail: {}
 			}
 		},
 		onLoad(options) {
+			this.$api('/order-detail/' + options.id).then(({data}) => {
+				this.detail = data
+			})
 		},
 		methods: {
 			

@@ -6,11 +6,11 @@
 		<view class="flex-between nums">
 			<view>
 				<view>总盒子数量</view>
-				<view class="b">26541</view>
+				<view class="b">{{data.total_box_num}}</view>
 			</view>
 			<view>
 				<view>本月盒子剩余数量</view>
-				<view class="b">541</view>
+				<view class="b">{{data.month_box_num}}</view>
 			</view>
 		</view>
 		
@@ -19,14 +19,31 @@
 				<view class="ex-name flex-between ex-nameul">
 					<view class="le">发放记录</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
 					</view>
 				</view>
 				
-				<view class='cellbor cellbor-le'>
+				<view v-for="item in data.datas.data" :key="item.id" class='cellbor cellbor-le'>
+					<view class="sign">
+						<image src="../../static/image/sign.png"></image>
+						<text>{{item.transport_status_txt}}</text>
+					</view>
+					<van-cell-group :border="false">
+						<van-cell class='h' title="申请领取盒子" :border="false"></van-cell>
+						<view class="space">
+							<van-cell title="盒子类型：" :border="false" >
+								<view v-for="it in item.goods" :key="it.id">
+									{{it.title}}  ({{it.number}}个)<br/>
+								</view>
+							</van-cell>
+							<van-cell title="申请日期：" :value="item.application_date" :border="false" />
+						</view>
+					</van-cell-group>
+				</view>
+				<!-- <view class='cellbor cellbor-le'>
 					<view class="sign">
 						<image src="../../static/image/sign.png"></image>
 						<text>已派送</text>
@@ -43,25 +60,7 @@
 							<van-cell title="申请日期：" value="2023/02/24" :border="false" />
 						</view>
 					</van-cell-group>
-				</view>
-				<view class='cellbor cellbor-le'>
-					<view class="sign">
-						<image src="../../static/image/sign.png"></image>
-						<text>已派送</text>
-					</view>
-					<van-cell-group :border="false">
-						<van-cell class='h' title="申请领取盒子" :border="false"></van-cell>
-						<view class="space">
-							<van-cell title="盒子类型：" :border="false" >
-								<view>
-									500方盒  (500个)<br/>
-									320正方盒 (500个)<br/>
-								</view>
-							</van-cell>
-							<van-cell title="申请日期：" value="2023/02/24" :border="false" />
-						</view>
-					</van-cell-group>
-				</view>
+				</view> -->
 				
 				
 			</view>
@@ -80,9 +79,25 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				date: '',
+				data: {
+					datas: []
+				}
 			}
 		},
+		onLoad() {
+			this.getList()
+		},
 		methods: {
+			bindDateChange(e) {
+				this.date = e.detail.value
+				this.getList(this.date)
+			},
+			getList(search_month) {
+				this.$api('/grant-record', { search_month }).then(({data}) => {
+					this.data = data
+				})
+			}
 		}
 	}
 </script>

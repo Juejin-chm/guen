@@ -4,8 +4,8 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view :class="[status==1?'cur':'']" @click="status = 1">佣金消息</view>
-			<view :class="[status==2?'cur':'']" @click="status = 2">平台消息</view>
+			<view :class="[status==1?'cur':'']" @click="tabClick(1)">佣金消息</view>
+			<view :class="[status==2?'cur':'']" @click="tabClick(2)">平台消息</view>
 		</view>
 		
 		<view class="box boxhui">
@@ -28,13 +28,13 @@
 				</view>
 				
 				<view class="msgul" v-if="status==1">
-					<view class="msgli" @click="cliPop">
+					<view v-for="item in list" class="msgli" @click="cliPop(item.id)" :key="item.id">
 						<view>
 							<view>您有新的佣金收益消息</view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
 					</view>
-					<view class="msgli">
+					<!-- <view class="msgli">
 						<view>
 							<view>您有新的佣金提取消息</view>
 						</view>
@@ -51,26 +51,15 @@
 							<view>您有新的下级成员加入</view>
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
-					</view>
+					</view> -->
 				</view>
 				<view class="msgul" v-else>
-					<view class="msgli" @tap="goDetail">
+					
+					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view class="dot">平台消息通知标题</view>
+							<view :class="[item.isread ? 'gold' : 'red']">{{item.title}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-					</view>
-					<view class="msgli" @tap="goDetail">
-						<view>
-							<view class="gold">成为推广大使审核通过消息</view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-					</view>
-					<view class="msgli" @tap="goDetail">
-						<view>
-							<view class="gold">成为广告主审核驳回消息</view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{item.format_time}}</view>
 					</view>
 				</view>
 			</view>
@@ -81,23 +70,24 @@
 				<view class="msgul">
 					<view class="msgli">
 						<view>
-							<view>您有新的佣金提取消息</view>
+							<view>{{detail.title}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{detail.format_date}}</view>
 					</view>
 				</view>
 				<!-- 您有新的佣金提取消息: -->
 				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space spaceNum">
-							<view>已提取佣金<text> -￥541.25</text></view>
-							<view>剩余可提取佣金<text>￥0.00</text></view>
-							<view>不可提取佣金<text>￥241.12</text></view>
+							<view>已提取佣金<text> -￥{{detail.order_commission}}</text></view>
+							<view>剩余可提取佣金<text>￥{{detail.user_available_money}}</text></view>
+							<view>不可提取佣金<text>￥{{detail.user_frozen_money}}</text></view>
 						</view>
 					</van-cell-group>
 				</view>
+				
 				<!-- 您有新的佣金收益消息: -->
-				<view class="cellbor cellbor-le">
+				<!-- <view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space spaceNum">
 							<view>收到佣金<text> +￥13.25</text></view>
@@ -105,9 +95,10 @@
 							<view>不可提取佣金<text>￥241.12</text></view>
 						</view>
 					</van-cell-group>
-				</view>
+				</view> -->
+				
 				<!-- 您有新的下级成员加入: -->
-				<view class="cellbor cellbor-le">
+				<!-- <view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space spaceNum">
 							<view class="head">
@@ -116,7 +107,7 @@
 							</view>
 						</view>
 					</van-cell-group>
-				</view>
+				</view> -->
 			</view>
 		</van-popup>
 		
@@ -136,13 +127,22 @@
 				status:1, //1-佣金消息  2-平台消息
 				list: [],
 				detail: {},
-				date: ''
+				date: '',
+				msgList: []
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
 		methods: {
+			tabClick(val) {
+				this.status = val
+				if (this.status == 2) {
+					this.getMsgList()
+				} else {
+					this.getList()
+				}
+			},
 			close() {
 				this.showPop = false
 			},
@@ -154,12 +154,20 @@
 					this.list = data.data
 				})
 			},
-			cliPop(){
-				this.showPop = true
+			getMsgList(search_month) {
+				this.$api('/platform-message-list', {search_month}).then(({data}) => {
+					this.msgList = data.data
+				})
 			},
-			goDetail(){
+			cliPop(id){
+				this.showPop = true
+				this.$api('/tgds-msg-detail/' + id).then(({data})=> {
+					this.detail = data
+				})
+			},
+			goDetail(id){
 				uni.navigateTo({
-					url:'../messageDetail/messageDetail'
+					url:'../messageDetail/messageDetail?id=' + id
 				})
 			},
 			bindDateChange(e) {

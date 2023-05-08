@@ -26,7 +26,7 @@
 				<view class="ex-name flex-between">
 					<view class="le">佣金消息</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -34,13 +34,13 @@
 				</view>
 				
 				<view class="msgul">
-					<view v-for="item in 5" :key="item" class="msgli">
-						<image src="../../static/image/head.png" mode=""></image>
+					<view v-for="(item, index) in data.datas.data" :key="index" class="msgli">
+						<image :src="item.avatar" mode=""></image>
 						<view>
-							<view>昵称</view>
+							<view>{{item.name}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-						<view class="num red">+11.00</view>
+						<view class="time">{{item.format_date}}</view>
+						<view class="num red">+{{item.diff_money}}</view>
 					</view>
 					<!-- <view class="msgli">
 						<image src="../../static/image/head.png" mode=""></image>
@@ -75,6 +75,7 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				date: '',
 				data: {}
 			}
 		},
@@ -82,12 +83,18 @@
 			console.log('refresh...');
 		},
 		onLoad() {
-			this.$api('/commission-list').then(({data}) => {
-				this.data = data
-			})
+			this.getList()
 		},
 		methods: {
-			
+			getList(search_month) {
+				this.$api('/commission-list', { search_month }).then(({data}) => {
+					this.data = data
+				})
+			},
+			bindDateChange(e) {
+				this.date = e.detail.value
+				this.getList(this.date)
+			}
 		}
 	}
 </script>

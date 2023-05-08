@@ -22,8 +22,8 @@
 									<text :style="{'opacity':subin==0?'1':'0'}">{{cateNameList[key]}}：</text>
 									<text>{{delId(subit)}}</text>
 								</view>
-								<input type="number" placeholder="填写数量" :value="boxNumber[key]" @input="(e) => inputChange(e, key)">
-								<view class="close">
+								<input type="number" placeholder="填写数量" :value="boxNumber[key][subin]" @input="(e) => inputChange(e, key, subin)">
+								<view class="close" @click="delBox(key, subin)">
 									<image src="../../static/image/close.png" mode=""></image>
 								</view>
 							</view>
@@ -32,25 +32,25 @@
 				</view>
 			</view>
 			
-			<van-field label="收货人" placeholder="请输入"  />
-			<van-field label="联系电话" placeholder="请输入" />
+			<van-field label="收货人" placeholder="请输入" @input="(e) => onInput(e, 'consignee')"  />
+			<van-field label="联系电话" placeholder="请输入" :maxlength="11" type="digit" @input="(e) => onInput(e, 'phone')" />
 			<van-cell title="收货地址" is-link :border='false'>
 				<picker mode='region' @change="pickerCityChange">
 					<view :class="pickerValue?'value':''">{{pickerValue?pickerValue:'请选择省/市/区'}}</view>
 				</picker>
 			</van-cell>
-			<van-field class="vfield-line" :border='false' placeholder="请输入详细地址" />
+			<van-field class="vfield-line" :border='false' placeholder="请输入详细地址" @input="addrInput" />
 		</van-cell-group>
 		
 		<van-cell-group inset class="v-group" :border='false'>
 			<view class="vcell-msg-warp">
-				<van-field label="申请原因" type="textarea" class="vcell-msg" placeholder="请输入..." ></van-field>
+				<van-field label="申请原因" type="textarea" class="vcell-msg" placeholder="请输入..." @input="remarkInput"></van-field>
 			</view>
 		</van-cell-group>
 		
 		<view class="fixedbtn">
 			<view class="envpad">
-				<button class="btn" form-type="submit">提交</button>
+				<button class="btn" form-type="submit" @click="submit">提交</button>
 			</view>
 		</view>
 		
@@ -125,30 +125,7 @@
 				show: false,
 				//模拟数据列表
 				index:null,
-				// list: [{
-				// 	id:1,
-				// 	label: '方盒系列',
-				// 	child:[{
-				// 			label: '500方盒',
-				// 			value: '500方盒'
-				// 		},{
-				// 			label: '650方盒',
-				// 			value: '650方盒'
-				// 		}
-				// 	]},
-				// {	
-				// 	id:2,
-				// 	label: '正方盒系列',
-				// 	child:[
-				// 		{
-				// 			label: '320正方盒',
-				// 			value: '320正方盒'
-				// 		},{
-				// 			label: '650正方盒',
-				// 			value: '650正方盒'
-				// 		}
-				// 	]
-				// }],
+				
 				datalist:[],
 				//模拟初始数据
 				tval: [],
@@ -157,12 +134,17 @@
 				cateBoxes: [], // 传了分类id之后的盒子列表
 				checkedBox: {}, // 选中的分类盒子
 				cateNameList: {}, //维护一个分类名字列表, key 和checkedBox 的 key 对应
-				boxNumber: {}
+				boxNumber: {}, // 每个分类 不同盒子的数量  { key: [] }
+				
+				pickerValue: '',
+				phone: '',
+				consignee: '',
+				detail_addr: '',
+				remark: '',
 			}
 		},
 		computed: {
 			compCheckedBox() {
-				console.log(Object.values(this.checkedBox).flat(2), '------------');
 				return Object.values(this.checkedBox).flat(2).map(item => this.delId(item)) || []
 			}
 		},
@@ -172,8 +154,52 @@
 			})
 		},
 		methods: {
-			inputChange(e, key) {
-				this.boxNumber[key] = e.detail.value
+			delBox(key, index) {
+				
+			},
+			onInput(e, key) {
+				this[key] = e.detail
+			},
+			addrInput(e) {
+				this.detail_addr = e.detail
+			},
+			remarkInput(e) {
+				this.remark = e.detail
+			},
+			submit() {
+				let order_goods = []
+				console.log(this.boxInfo, this.boxNumber, this.cateNameList, this.checkedBox, '--0');
+				for (let key in this.checkedBox) {
+					this.checkedBox[key].forEach((item, index) => {
+						order_goods.push({ id: this.delId(item, true), number: this.boxNumber[key][index] })
+					})
+				}
+				console.log(order_goods, 'order_goods---------');
+				return
+				const formData = {
+					store_name: this.boxInfo.company,
+					order_goods: order_goods,
+					consignee: this.consignee,
+					phone: this.phone,
+					province: this.pickerValue[0],
+					city: this.pickerValue[1],
+					county: this.pickerValue[2],
+					detail_addr: this.detail_addr,
+					remark: this.remark
+				}
+				
+				this.$api('/bus-create-order', formData).then((data) => {
+					if (data.code == 405) {
+						return uni.redirectTo({ url: '/pages/tip/tip?isError=1' })
+					}
+					uni.redirectTo({ url: '/pages/tip/tip?isError=0' })
+				})
+			},
+			inputChange(e, key, index) {
+				if (this.boxNumber[key] === undefined) {
+					this.$set(this.boxNumber, key, [])
+				}
+				this.boxNumber[key][index] = e.detail.value
 			},
 			delId(str, isKey) {
 				const res = str.split('-')
@@ -183,11 +209,8 @@
 				this.show = false
 			},
 			checkboxChange(e) {
-				console.log('checkbox change..', e);
 				const checkeds = e.detail.value
 				this.$set(this.checkedBox, this.index, checkeds)
-				
-				console.log(this.checkedBox,this.cateNameList,  'checkedBox');	
 			},
 			getCateboxes(cate_id) {
 				this.$api('/search-goods-by-cate', { cate_id }).then(({data}) => {
@@ -196,7 +219,6 @@
 						this.checkedBox[this.index]?.includes(item.goods_name+ `-${item.order_goods_id}`) && (item.checked = true)
 						return item
 					})
-					console.log(this.cateBoxes, 'ew')
 				})
 			},
 			bindPickerChange(e){
@@ -213,7 +235,7 @@
 				this.pickerValue = e.detail.value
 			},
 			formSubmit(e) {
-				console.log(e)
+				console.log(e, '1111111111')
 			},
 			showChoose(){
 				this.show = true;

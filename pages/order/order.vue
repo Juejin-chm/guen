@@ -22,58 +22,26 @@
 					</view>
 				</view>
 				
-				<view class='cellbor'>
+				<view v-for="item in list" :class="['cellbor', {cellborhui: item.order_status == 3}]">
 				    <van-cell-group :border="false">
-						<van-cell is-link url='/pages/orderDetail/orderDetail' class='h'>
+						<van-cell is-link :url='`/pages/orderDetail/orderDetail?id=${item.id}`' class='h'>
 							<view slot="title">
-								<text>订单号：</text>4455336
+								<text>订单号：</text>{{item.order_sn}}
 							</view>
-							<view class="red">待投放</view>
+							<view :class="{red: item.order_status == 1, theme: item.order_status == 2}">{{item.format_order_status}}</view>
 						</van-cell>
 						<view class="space">
-							<van-cell title="盒子总数量：" value="10000" :border="false" />
-							<van-cell title="投放套餐：" value="套餐一" :border="false" />
-							<van-cell title="投放开始-结束：" value="2023/01/01-2023/12/31" :border="false" />
+							<van-cell title="盒子总数量：" :value="item.number" :border="false" />
+							<van-cell title="投放套餐：" value="" :border="false" />
+							<van-cell title="投放开始-结束：" :value="item.format_period" :border="false" />
 							<van-cell title="价格：" :border="false">
-								<view style="color: #ff5050;">￥2000</view>
+								<view style="color: #ff5050;">￥{{item.money}}</view>
 							</van-cell>
 						</view>
 				    </van-cell-group>
 				</view>
-				<view class='cellbor'>
-				    <van-cell-group :border="false">
-						<van-cell is-link url='/pages/orderDetail/orderDetail' class='h'>
-							<view slot="title">
-								<text>订单号：</text>4455336
-							</view>
-							<view>已投放</view>
-						</van-cell>
-						<view class="space">
-							<van-cell title="盒子总数量：" value="10000" :border="false" />
-							<van-cell title="投放套餐：" value="套餐一" :border="false" />
-							<van-cell title="投放开始-结束：" value="2023/01/01-2023/12/31" :border="false" />
-							<van-cell title="价格：" :border="false">
-								<view style="color: #ff5050;">￥2000</view>
-							</van-cell>
-						</view>
-				    </van-cell-group>
-				</view>
-				<view class='cellbor cellborhui'>
-				    <van-cell-group :border="false">
-						<van-cell is-link url='/pages/orderDetail/orderDetail' class='h'>
-							<view slot="title">
-								<text>订单号：</text>4455336
-							</view>
-							<view>已结束</view>
-						</van-cell>
-						<view class="space">
-							<van-cell title="盒子总数量：" value="10000" :border="false" />
-							<van-cell title="投放套餐：" value="套餐一" :border="false" />
-							<van-cell title="投放开始-结束：" value="2023/01/01-2023/12/31" :border="false" />
-							<van-cell title="价格：" value="￥2000" :border="false"/>
-						</view>
-				    </van-cell-group>
-				</view>
+				
+				
 				
 			</view>
 		</view>
@@ -91,7 +59,8 @@
 				},
 				tabs: [],
 				curTab: 'all',
-				date: undefined
+				date: undefined,
+				list: []
 			}
 		},
 		onLoad(option) {
@@ -110,6 +79,7 @@
 					search_month: month
 				}).then(({data}) => {
 					console.log(data, '123data');
+					this.list = data.data
 				})
 			},
 			tabChange(key) {
@@ -129,5 +99,8 @@
 </style>
 <style scoped lang="less">
 	@import "@/static/style/cell.less";
+	.theme {
+		color: #CBA868;
+	}
 </style>
 

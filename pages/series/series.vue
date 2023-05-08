@@ -4,7 +4,7 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="box">
-			<the-series />
+			<the-series :tabArr="tabArr" :boxes="boxes" @tabChange="tabChange"/>
 
 			<!-- <view class="setabs">
 				<view :class="setindex==index?'cur':''" v-for="(item,index) in tabArr" :key="index" @tap="clitabs(index)">{{item}}</view>
@@ -47,12 +47,26 @@ import theSeries from '@/component/Series'
 				},
 				tabArr:['方盒系列','正方盒系列','圆形系列','美式圆形系列','方盒系列','方盒系列','方盒系列'],
 				setindex:0,
+				boxes: [],
 			}
+		},
+		onLoad() {
+			this.$api('/index-index').then(({data}) => {
+				this.tabArr = data.boxCates
+				this.boxes = data.boxes
+			})
 		},
 		methods: {
 			clitabs(index){
 				this.setindex = index;
 			},
+			tabChange(id) {
+				this.$api('/get-box-by-cate', {
+					cate_id: id
+				}).then(({data}) => {
+					this.boxes = data.data
+				})
+			}
 		}
 	}
 </script>

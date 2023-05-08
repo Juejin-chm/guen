@@ -2,7 +2,7 @@
 	"pages": [
 		{
 		    "path" : "pages/applyBox/applyBox",
-		    "style" :                                                                                    
+		    "style" :
 		    {
 		        "navigationBarTitleText": "申请领取盒子",
 		        "enablePullDownRefresh": false
@@ -17,6 +17,29 @@
 			}
 		}
 		    ,
+		{
+		    "path" : "pages/discountDetail/discountDetail",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "投放套餐详情",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		},
+		
+		
+		{
+		    "path" : "pages/discount/discount",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "投放套餐",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		},
+		
+		
+		
 		{
 		    "path" : "pages/myCommission/myCommission",
 		    "style" :                                                                                    

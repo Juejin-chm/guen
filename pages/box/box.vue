@@ -21,26 +21,33 @@
 					</view>
 				</view>
 				
-				<view class='cellbor'>
+				<view v-for="item in list" :key="item.id" class='cellbor'>
 				    <van-cell-group :border="false">
-						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
+						<van-cell is-link :url='`/pages/boxDetail/boxDetail?id=${item.id}`' class='h'>
 							<view slot="title" class="title">
-								<text>订单号：</text>4455336
+								<text>订单号：</text>{{item.order_sn}}
 							</view>
-							<view class="red">未派送</view>
+							<view :class="{red: item.transport_status == 1, theme: item.transport_status == 2, done: item.transport_status == 3}">{{item.transport_status_txt}}</view>
 						</van-cell>
 						<view class="space">
 							<van-cell title="盒子类型：" :border="false" >
-								<view>
-									500方盒  (500个)<br/>
-									320正方盒 (500个)<br/>
+								<view v-for="it in item.goods" :key="item.id">
+									{{it.title}}&nbsp;&nbsp; （{{it.number}}个) <br>
 								</view>
 							</van-cell>
-							<van-cell title="审核通过日期：" value="2023/02/24" :border="false" />
+							<van-cell title="审核通过日期：" :value="item.examine_push_date" :border="false" />
+							<van-cell v-if="item.transport_status == 2" title="快递单号：" :border="false" >
+								<image src="@/static/image/copy.png" style="width: 24rpx;height: 24rpx;margin-right: 20rpx;"></image>
+								<text>4565541122255</text>
+							</van-cell>
+						</view>
+						<view v-if="item.transport_status != 1" class="ft">
+							<view class="btn" :class="item.transport_status == 2 ? 'confirm' : 'cancel'" @click="delOrder(item.transport_status, item.id)">{{item.transport_status == 2 ? '确认完成' : '删除订单'}}</view>
 						</view>
 				    </van-cell-group>
 				</view>
-				<view class='cellbor'>
+				<!--  -->
+				<view v-if="false" class='cellbor'>
 				    <van-cell-group :border="false">
 						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
 							<view slot="title" class="title">
@@ -66,7 +73,7 @@
 						</view>
 				    </van-cell-group>
 				</view>
-				<view class='cellbor'>
+				<view v-if="false" class='cellbor'>
 				    <van-cell-group :border="false">
 						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
 							<view slot="title" class="title">
@@ -104,24 +111,37 @@
 					date:null,
 				},
 				tabs: [],
-				curTab: 'all'
+				curTab: 'all',
+				list: []
 			}
 		},
 		onLoad(option) {
 			this.$api('/box-order-transport-status').then(({data}) => {
 				this.tabs = data
 			})
+			this.getList(this.curTab, this.date)
 		},
 		methods: {
+			async delOrder(status, id) {
+				if (status == 2) {
+					await this.$api('/confirm-finish-order/' + id)
+				} else {
+					await this.$api('/del-bus-order/' + id)
+				}
+				this.getList(this.curTab, this.date)
+			},
 			getList(status, month) {
 				this.$api('/box-order-list', {
 					search_status: status,
 					search_month: month
+				}).then(({data}) => {
+					this.list = data.data
 				})
 			},
 			bindDateChange(e){
 				console.log(e.detail.value)
 				this.date = e.detail.value;
+				this.getList(this.status, this.date)
 			},
 			tabChange(key) {
 				this.curTab = key
@@ -136,6 +156,11 @@
 </style>
 <style scoped lang="less">
 	@import "@/static/style/cell.less";
-	
+	.theme {
+		color: #CBA868;
+	}
+	.done {
+		color: #189B73;
+	}
 </style>
 
