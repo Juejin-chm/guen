@@ -23,7 +23,7 @@
 									<text>{{delId(subit)}}</text>
 								</view>
 								<input type="number" placeholder="填写数量" :value="boxNumber[key][subin]" @input="(e) => inputChange(e, key, subin)">
-								<view class="close" @click="delBox(key, subin)">
+								<view class="close" @click="delBox(key, subin, subit)">
 									<image src="../../static/image/close.png" mode=""></image>
 								</view>
 							</view>
@@ -61,7 +61,7 @@
 			custom-style="height:80%;"
 		>
 			<view class="choosepop">
-				<form @submit="formSubmit">
+				<form >
 					<view class="h">选择盒子</view>
 					<view class="sign">已选：<text>{{compCheckedBox.join('; ')}}</text></view>
 					<view class="h5">选择系列</view>
@@ -73,12 +73,7 @@
 					</view>
 					
 					<view class="h5">选择盒子</view>
-					<!-- <select-lay 
-						:value="tval" 
-						name="name" 
-						:options="datalist" 
-						@selectitem="selectitem"
-					/> -->
+				
 					<template>
 						<!-- 下拉 input 框 -->
 						<view class="selector-input" @click="SVShow = !SVShow">{{ compCheckedBox.length ? compCheckedBox.join() : '请选择' }}</view>
@@ -125,10 +120,7 @@
 				show: false,
 				//模拟数据列表
 				index:null,
-				
-				datalist:[],
-				//模拟初始数据
-				tval: [],
+
 				
 				boxInfo: {},
 				cateBoxes: [], // 传了分类id之后的盒子列表
@@ -155,7 +147,15 @@
 		},
 		methods: {
 			delBox(key, index) {
-				
+				const [item] = this.checkedBox[key].splice(index, 1)
+				this.boxNumber[key]?.splice(index, 1)
+				const id = this.delId(item, true)
+				// console.log('id.......', this.cateBoxes);
+				this.cateBoxes.forEach(item => {
+					if (item.order_goods_id == id) {
+						item.checked = false
+					}
+				})
 			},
 			onInput(e, key) {
 				this[key] = e.detail
@@ -175,7 +175,7 @@
 					})
 				}
 				console.log(order_goods, 'order_goods---------');
-				return
+				// return
 				const formData = {
 					store_name: this.boxInfo.company,
 					order_goods: order_goods,
@@ -211,6 +211,14 @@
 			checkboxChange(e) {
 				const checkeds = e.detail.value
 				this.$set(this.checkedBox, this.index, checkeds)
+				// checkeds.forEach(item => {
+				// 	const target = this.cateBoxes.find(_item => {
+				// 		return _item.order_goods_id == this.delId(item, true)
+				// 	})
+				// 	if (target ) {
+				// 		target.checked = true
+				// 	}
+				// })
 			},
 			getCateboxes(cate_id) {
 				this.$api('/search-goods-by-cate', { cate_id }).then(({data}) => {
@@ -228,25 +236,18 @@
 				this.cateNameList[index] = this.boxInfo.orderGoodsCate[index].cate_name
 				
 				this.getCateboxes(this.boxInfo.orderGoodsCate[index].cate_id)
-				this.datalist = this.cateBoxes
 			},
 			pickerCityChange(e) {
-				console.log(e, 'aaaaaaaaaaa');
 				this.pickerValue = e.detail.value
 			},
-			formSubmit(e) {
-				console.log(e, '1111111111')
-			},
+			
 			showChoose(){
 				this.show = true;
 			},
 			onClose(){
 				this.show = false;
 			},
-			// change(item,value) {
-			// 	console.log(item,value);
-			// 	this.tval = value;
-			// }
+			
 		}
 	}
 </script>

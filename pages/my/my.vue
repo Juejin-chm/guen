@@ -36,7 +36,7 @@
 				</view>
 				<view class="rolename"><image src="@/static/image/switch.png"></image><text>切换角色</text></view>
 				<view class="roles flex-between">
-					<view v-for="(item,index) in idenArr" :key="index" :class="{'cur':identity==(index+1),'opc':identity==0}" @tap="changeIden(index+1,item.hasAuth)">
+					<view v-for="(item,index) in idenArr" :key="index" :class="{'cur':identity==(index+1),'opc':identity==0}" @tap="changeIden(index+1,item.hasAuth,item.title)">
 						<image :src="`../../static/image/r${index+1}.png`"></image>
 						<text>{{item.title}}</text>
 					</view>
@@ -317,7 +317,7 @@
 					this.showAuth = false
 				})
 			},
-			changeIden(index,hasAuth){
+			changeIden(index,hasAuth, role){
 				//普通用户申请角色未审核成功的，点击切换的角色时，跳出提醒“您还不是XXX，请申请认证”
 				if(hasAuth){
 					this.identity = index;
@@ -335,7 +335,7 @@
 				}else{
 					uni.showModal({
 						title: '提示',
-						content: '您还不是XXX，请申请认证',
+						content: `您还不是${role}，请申请认证`,
 						success: function (res) {
 							if (res.confirm) {
 								console.log('用户点击确定');

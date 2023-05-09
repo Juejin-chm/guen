@@ -1,6 +1,13 @@
 {
 	"pages": [
 		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		}
+		    ,
+		{
 		    "path" : "pages/applyBox/applyBox",
 		    "style" :
 		    {
@@ -10,13 +17,7 @@
 		    
 		}
 		,
-		{
-			"path": "pages/my/my",
-			"style": {
-				"navigationBarTitleText": "我的"
-			}
-		}
-		    ,
+		
 		{
 		    "path" : "pages/discountDetail/discountDetail",
 		    "style" :                                                                                    
