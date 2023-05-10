@@ -4,7 +4,7 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view v-for="item in tabs" :key="item.key" :class="{cur: item.key === curTab}" @click="tabChange(item.key)">{{ item.value }}</view>
+			<view v-for="item in tabs" :key="item.key" :class="{cur: item.key == curTab}" @click="tabChange(item.key)">{{ item.value }}</view>
 	<!-- 		<view>未派送</view>
 			<view>已派送</view>
 			<view>已完成</view> -->
@@ -51,7 +51,7 @@
 				    <van-cell-group :border="false">
 						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
 							<view slot="title" class="title">
-								<text>订单号：</text>4455336
+								<text>订单号：</text>4455336-test
 							</view>
 							<view>已派送</view>
 						</van-cell>
@@ -73,7 +73,7 @@
 						</view>
 				    </van-cell-group>
 				</view>
-				<view v-if="false" class='cellbor'>
+				<!-- <view v-if="false" class='cellbor'>
 				    <van-cell-group :border="false">
 						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
 							<view slot="title" class="title">
@@ -94,7 +94,8 @@
 							<view class="btn cancel">删除订单</view>
 						</view>
 				    </van-cell-group>
-				</view>
+				</view> -->
+			
 			</view>
 		</view>
 	</view>
@@ -112,16 +113,32 @@
 				},
 				tabs: [],
 				curTab: 'all',
-				list: []
+				list: [],
+				curPage: 1,
+				
 			}
 		},
+		async onReachBottom() {
+			console.log('reach bottom');
+			this.getMore()
+		},
 		onLoad(option) {
+			this.curTab = option.key
 			this.$api('/box-order-transport-status').then(({data}) => {
 				this.tabs = data
 			})
 			this.getList(this.curTab, this.date)
 		},
 		methods: {
+			async getMore() {
+				if (this.list.length < 10) {
+					return
+				}
+				const curList = JSON.parse(JSON.stringify(this.list))
+				this.curPage += 1
+				const data = await this.getList(this.curTab, this.date, this.curPage)
+				this.list = curList.concat(data)
+			},
 			async delOrder(status, id) {
 				if (status == 2) {
 					await this.$api('/confirm-finish-order/' + id)
@@ -130,16 +147,17 @@
 				}
 				this.getList(this.curTab, this.date)
 			},
-			getList(status, month) {
-				this.$api('/box-order-list', {
+			async getList(status, month, page) {
+				await this.$api('/box-order-list', {
 					search_status: status,
-					search_month: month
+					search_month: month,
+					page
 				}).then(({data}) => {
 					this.list = data.data
 				})
+				return this.list
 			},
 			bindDateChange(e){
-				console.log(e.detail.value)
 				this.date = e.detail.value;
 				this.getList(this.status, this.date)
 			},

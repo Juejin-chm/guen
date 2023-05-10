@@ -85,7 +85,7 @@
 				</view>
 				
 				<div class="ad">
-					<image src="@/static/image/adimg.png" mode="widthFix" style="width: 100%;"></image>
+					<image src="@/static/image/adimg.png" mode="widthFix" style="width: 100%;" @click="joinUs"></image>
 				</div>
 				
 				<div class="ititr">
@@ -109,7 +109,6 @@
 <script>
 import theSeries from '@/component/Series'
 import req from '../../request/index.js'
-import { login } from '../../request/auth.js'
 	export default {
 		components: { theSeries },
 		data() {
@@ -142,14 +141,18 @@ import { login } from '../../request/auth.js'
 		},
 		onLoad() {
 			this.getPageData()
-			uni.getUserInfo({
-				success(res) {
-					console.log(res, '11111');
-				}
-			})
+			// uni.getUserInfo({
+			// 	success(res) {
+			// 		console.log(res, '11111');
+			// 	}
+			// })
 		},
 		methods: {
-			
+			joinUs() {
+				uni.switchTab({
+					url: '/pages/join/join'
+				})
+			},
 			curChange(e){
 				this.current = e.detail.current;
 			},

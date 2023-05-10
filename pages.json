@@ -8,6 +8,13 @@
 		}
 		    ,
 		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		
+		{
 		    "path" : "pages/applyBox/applyBox",
 		    "style" :
 		    {
@@ -81,12 +88,7 @@
 			}
 		},
 		
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "首页"
-			}
-		},
+		
 		{
 		    "path" : "pages/business/business",
 		    "style" :                                                                                    

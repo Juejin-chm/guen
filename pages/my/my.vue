@@ -85,19 +85,19 @@
 					
 					<view class="mh">盒子订单</view>
 					<view class="mul">
-						<view @tap="goBox">
+						<view @tap="goBox('all')">
 							<image src="../../static/image/order1.png"></image>
 							<view>全部订单</view>
 						</view>
-						<view @tap="goBox">
+						<view @tap="goBox('1')">
 							<image src="../../static/image/order2.png"></image>
 							<view>未派送</view>
 						</view>
-						<view @tap="goBox">
+						<view @tap="goBox('2')">
 							<image src="../../static/image/order3.png"></image>
 							<view>已派送</view>
 						</view>
-						<view @tap="goBox">
+						<view @tap="goBox('3')">
 							<image src="../../static/image/order4.png"></image>
 							<view>已完成</view>
 						</view>
@@ -267,13 +267,20 @@
 			}
 		},
 		onLoad() {
-			this.$api('/role-list').then(({data}) => {
-				this.idenArr[0].hasAuth = data[1].has_role
-				this.idenArr[1].hasAuth = data[2].has_role
-				this.idenArr[2].hasAuth = data[3].has_role
-			})
+			const token = uni.getStorageSync("access_token")
+			if (token) {
+				this.getRoleList()
+			}
+			
 		},
 		methods: {
+			getRoleList() {
+				this.$api('/role-list').then(({data}) => {
+					this.idenArr[0].hasAuth = data[1].has_role
+					this.idenArr[1].hasAuth = data[2].has_role
+					this.idenArr[2].hasAuth = data[3].has_role
+				})
+			},
 			goBusiness() {
 				uni.navigateTo({
 					url:'/pages/business/business'
@@ -312,9 +319,12 @@
 			},
 			sumbit() {
 				login().then((data) => {
-					this.nickname = data.nickname
+					this.nickname = data.niackname
 					this.avatarUrl = data.avatarUrl
 					this.showAuth = false
+					console.log(data, this.nickname, '00data')
+					this.access_token = uni.getStorageSync('access_token')
+					this.getRoleList()
 				})
 			},
 			changeIden(index,hasAuth, role){
@@ -351,9 +361,9 @@
 					url:'../apply/apply?key=' + key
 				})
 			},
-			goBox(){
+			goBox(key){
 				uni.navigateTo({
-					url:'../box/box'
+					url:'../box/box?key=' + key
 				})
 			},
 			

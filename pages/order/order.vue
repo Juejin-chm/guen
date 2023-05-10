@@ -22,7 +22,7 @@
 					</view>
 				</view>
 				
-				<view v-for="item in list" :class="['cellbor', {cellborhui: item.order_status == 3}]">
+				<view v-for="item in list" :key="item.id" :class="['cellbor', {cellborhui: item.order_status == 3}]">
 				    <van-cell-group :border="false">
 						<van-cell is-link :url='`/pages/orderDetail/orderDetail?id=${item.id}`' class='h'>
 							<view slot="title">
@@ -64,7 +64,7 @@
 			}
 		},
 		onLoad(option) {
-			this.curTab = option.key
+			this.curTab = option.key =='all' ? option.key : +option.key + 1
 			console.log(option, 'option');
 			this.$api('/order-const').then(({data}) => {
 				console.log(data, 'data');

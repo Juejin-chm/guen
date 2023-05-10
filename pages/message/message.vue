@@ -30,9 +30,9 @@
 				</view>
 				<!-- 审核通知 -->
 				<view class="msgul" v-if="status==1">
-					<view v-for="item in applyList" class="msgli" :key="item.id" @tap="cliPop(item.id)">
+					<view v-for="item in list" class="msgli" :key="item.id" @tap="cliPop(item.id)">
 						<view>
-							<view :class="{dot: item.is_read}">{{item.title}}<text :class="{green: item.status == 2, red: item.status == 3}">（{{item.status == 2 ? '通过' : '驳回'}}）</text></view>
+							<view :class="{dot: !item.isread}">{{item.title}}<text :class="[item.status == 1 ? 'green' : 'red']">（{{item.status == 1 ? '通过' : '驳回'}}）</text></view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
@@ -57,9 +57,10 @@
 						</view>
 						<view class="time">2023/02/12 12:26:54</view>
 					</view> -->
-					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
+					<view v-for="item in list" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view :class="[item.isread ? 'gold' : 'red']">{{item.title}}</view>
+							<!-- <view :class="[item.isread ? 'gold' : 'red']">{{item.title}}</view> -->
+							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
@@ -121,7 +122,10 @@
 				msgList: [],
 				detailData: {},
 				applyList: [],
-				applyTab: []
+				applyTab: [],
+				list: [],
+				curPage: 1,
+				total: 0
 			}
 		},
 		onLoad() {
@@ -130,26 +134,33 @@
 				this.applyTab = data
 			})
 		},
+		
 		methods: {
 			applyTabClick(key) {
 				console.log(key, 'key')
 				this.tabIndex = key
-				this.getApplyList(this.date, key)
+				this.getApplyList()
 			},
 			onClose() {
 				this.showPop = false
 			},
 			// 审核通知
-			getApplyList(search_month = this.date, search_status) {
-				this.$api('/box-order-msg-list', {search_month, search_status}).then(({data}) => {
-					this.applyList = data.data
+			async getApplyList(search_month = this.date, search_status = this.tabIndex, page = this.curPage) {
+				await this.$api('/box-order-msg-list', {search_month, search_status, page}).then(({data}) => {
+					// this.applyList = data.data
+					this.list = data.data
+					this.total = data.total
 				})
+				return this.list
 			},
 			// 平台消息
-			getList(search_month) {
-				this.$api('/platform-message-list', {search_month}).then(({data}) => {
-					this.msgList = data.data
+			async getList(search_month = this.date, page = this.curPage) {
+				await this.$api('/platform-message-list', {search_month, page}).then(({data}) => {
+					// this.msgList = data.data
+					this.list = data.data
+					this.total = data.total
 				})
+				return this.list
 			},
 			cliPop(id){
 				if (this.status == 1) {
@@ -171,12 +182,13 @@
 			bindDateChange(e) {
 				this.date = e.detail.value
 				if (this.status == 1) {
-					this.getApplyList(this.date)
+					this.getApplyList()
 				} else {
-					this.getList(this.date)
+					this.getList()
 				}
 			},
 			clickTab(v) {
+				this.curPage = 1
 				this.status = v
 				if (v === 2) {
 					this.getList()

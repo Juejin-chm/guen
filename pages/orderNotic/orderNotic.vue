@@ -21,7 +21,7 @@
 				</view>
 				
 				<view class="msgul" v-if="status==1">
-					<view v-for="item in list" class="msgli" @tap="cliPop(item.id)">
+					<view v-for="item in list" :key="item.id" class="msgli" @tap="cliPop(item.id)">
 						<view>
 							<view :class="{dot: !item.isread}">{{item.title}}</view>
 						</view>
@@ -35,9 +35,10 @@
 					</view> -->
 				</view>
 				<view class="msgul" v-else>
-					<view v-for="item in msgList" class="msgli" @tap="goDetail(item.id)">
+					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view :class="{dot: !item.isread}">{{item.title}}</view>
+							<!-- <view :class="{dot: !item.isread}">{{item.title}}</view> -->
+							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>

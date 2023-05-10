@@ -30,9 +30,9 @@
 				<view class="msgul" v-if="status==1">
 					<view v-for="item in list" class="msgli" @click="cliPop(item.id)" :key="item.id">
 						<view>
-							<view>您有新的佣金收益消息</view>
+							<view>{{item.title}}</view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{item.format_time}}</view>
 					</view>
 					<!-- <view class="msgli">
 						<view>
@@ -54,10 +54,9 @@
 					</view> -->
 				</view>
 				<view class="msgul" v-else>
-					
 					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view :class="[item.isread ? 'gold' : 'red']">{{item.title}}</view>
+							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
