@@ -17,7 +17,7 @@
 			<view>
 				<view>不可提取金额(元)</view>
 				<view class="b">{{data.freezeCommission}}</view>
-				<view class="tip">注：需成交{{'x'}}天后才可提现</view>
+				<view class="tip">{{data.remark}}</view>
 			</view>
 		</view>
 		

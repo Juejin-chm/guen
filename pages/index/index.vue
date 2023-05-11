@@ -3,8 +3,10 @@
 		<BarBg :bgtype='1'></BarBg>
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		<view class="sides">
-			<image src="@/static/image/s-c.png"></image>
-			<image src="@/static/image/s-t.png"></image>
+			<button style="width: auto;height: auto;background: transparent;padding: 0;" type="primary" open-type="contact">
+				<image src="@/static/image/s-c.png"></image>
+			</button>
+			<image src="@/static/image/s-t.png" @click="callPhone(phone)"></image>
 		</view>
 		
 		<view class="swiper">
@@ -49,8 +51,12 @@
 						<image src="@/static/image/tl3.png"></image>
 						<view>广告投放</view>
 					</navigator>
-					<view>
-						<image src="@/static/image/tl4.png"></image>
+					
+					<view >
+						<button style="background: transparent;padding: 0;width: auto;height: auto;" type="primary" open-type="contact">
+							<image src="@/static/image/tl4.png"></image>
+						</button>
+						<!-- <image src="@/static/image/tl4.png"></image> -->
 						<view>联系客服</view>
 					</view>
 				</view>
@@ -137,6 +143,7 @@ import req from '../../request/index.js'
 				},
 				boxes: [],
 				code: '',
+				phone: ''
 			}
 		},
 		onLoad() {
@@ -148,6 +155,7 @@ import req from '../../request/index.js'
 			// })
 		},
 		methods: {
+			
 			joinUs() {
 				uni.switchTab({
 					url: '/pages/join/join'
@@ -167,6 +175,7 @@ import req from '../../request/index.js'
 					this.tabArr = res.boxCates
 					this.platData = res.platData
 					this.boxes = res.boxes
+					this.phone = res.phone
 				})
 			},
 			tabChange(id) {

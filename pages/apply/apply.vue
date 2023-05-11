@@ -69,7 +69,6 @@
 		},
 		onLoad(option) {
 			this.curTab = option.key
-			console.log(option,11);
 			this.$api('/examine-status-title').then(({data}) =>{
 				this.tabs = data
 				this.getList(option.key)
@@ -83,7 +82,6 @@
 					status,
 					search_month: month
 				}).then(({data}) => {
-					console.log(data, '-=data..............');
 					this.reviewList = data
 				})
 			},

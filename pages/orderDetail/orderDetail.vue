@@ -47,7 +47,7 @@
 			</view>
 			<view class='cellbor'>
 				<van-cell-group :border="false">
-					<van-cell class="tel" title="电话咨询" :value="detail.phone" :border="false" >
+					<van-cell class="tel" title="电话咨询" :value="detail.phone" :border="false"  @click="callPhone(phone)">
 						<view slot="right-icon">
 							<image src="../../static/image/tel.png" mode=""></image>
 						</view>

@@ -14,7 +14,7 @@
 				<view class="ex-name flex-between">
 					<view class="le">全部订单</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -37,8 +37,8 @@
 							</van-cell>
 							<van-cell title="审核通过日期：" :value="item.examine_push_date" :border="false" />
 							<van-cell v-if="item.transport_status == 2" title="快递单号：" :border="false" >
-								<image src="@/static/image/copy.png" style="width: 24rpx;height: 24rpx;margin-right: 20rpx;"></image>
-								<text>4565541122255</text>
+								<image src="@/static/image/copy.png" style="width: 24rpx;height: 24rpx;margin-right: 20rpx;" @click="copy(item.transport_danhao)"></image>
+								<text>{{item.transport_danhao}}</text>
 							</van-cell>
 						</view>
 						<view v-if="item.transport_status != 1" class="ft">
@@ -46,55 +46,8 @@
 						</view>
 				    </van-cell-group>
 				</view>
-				<!--  -->
-				<view v-if="false" class='cellbor'>
-				    <van-cell-group :border="false">
-						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
-							<view slot="title" class="title">
-								<text>订单号：</text>4455336-test
-							</view>
-							<view>已派送</view>
-						</van-cell>
-						<view class="space">
-							<van-cell title="盒子类型：" :border="false" >
-								<view>
-									500方盒  (500个)<br/>
-									320正方盒 (500个)<br/>
-								</view>
-							</van-cell>
-							<van-cell title="审核通过日期：" value="2023/02/24" :border="false" />
-							<van-cell title="快递单号：" :border="false" >
-								<image src="@/static/image/copy.png" style="width: 24rpx;height: 24rpx;margin-right: 20rpx;"></image>
-								<text>4565541122255</text>
-							</van-cell>
-						</view>
-						<view class="ft">
-							<view class="btn confirm">确认完成</view>
-						</view>
-				    </van-cell-group>
-				</view>
-				<!-- <view v-if="false" class='cellbor'>
-				    <van-cell-group :border="false">
-						<van-cell is-link url='/pages/boxDetail/boxDetail' class='h'>
-							<view slot="title" class="title">
-								<text>订单号：</text>4455336
-							</view>
-							<view class="green">已完成</view>
-						</van-cell>
-						<view class="space">
-							<van-cell title="盒子类型：" :border="false" >
-								<view>
-									500方盒  (500个)<br/>
-									320正方盒 (500个)<br/>
-								</view>
-							</van-cell>
-							<van-cell title="审核通过日期：" value="2023/02/24" :border="false" />
-						</view>
-						<view class="ft">
-							<view class="btn cancel">删除订单</view>
-						</view>
-				    </van-cell-group>
-				</view> -->
+				
+			
 			
 			</view>
 		</view>
@@ -130,15 +83,42 @@
 			this.getList(this.curTab, this.date)
 		},
 		methods: {
-			async getMore() {
-				if (this.list.length < 10) {
+			getMore() {
+				if (this.list.length >= this.total) {
 					return
 				}
-				const curList = JSON.parse(JSON.stringify(this.list))
 				this.curPage += 1
-				const data = await this.getList(this.curTab, this.date, this.curPage)
-				this.list = curList.concat(data)
+				if (this.status == 2) {
+					this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
+						data.data.forEach(item => {
+							this.list.push(item)
+							this.total = data.total
+						})
+					})
+				}
+				if (this.status == 1) {
+					this.$api('/box-order-list', {search_month: this.date, search_status: this.tabIndex , page: this.curPage}).then(({data}) => {
+						this.list = data.data
+						this.total = data.total
+					})
+				}
+				
 			},
+			copy(text) {
+				uni.setClipboardData({
+				  data: text,
+				  success: function (res) {
+				    uni.getClipboardData({
+				      success: function (res) {
+				        uni.showToast({
+				          title: "复制成功",
+				        });
+				      },
+				    });
+				  },
+				});
+			},
+		
 			async delOrder(status, id) {
 				if (status == 2) {
 					await this.$api('/confirm-finish-order/' + id)
@@ -147,11 +127,12 @@
 				}
 				this.getList(this.curTab, this.date)
 			},
-			async getList(status, month, page) {
+			async getList() {
+				this.curPage = 1
 				await this.$api('/box-order-list', {
-					search_status: status,
-					search_month: month,
-					page
+					search_status: this.curTab,
+					search_month: this.date,
+					page: this.curPage
 				}).then(({data}) => {
 					this.list = data.data
 				})

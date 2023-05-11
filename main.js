@@ -6,10 +6,13 @@ import Selects from './component/Selects/Selects'
 
 import api from './request/index.js'
 
+import Mixin from '@/mixins/mixins.js'
+
 Vue.component('CustomBar',CustomBar)
 Vue.component('BarBg',BarBg)
 Vue.component('select-lay',Selects)
 
+Vue.mixin(Mixin)
 Vue.prototype.$api = api
 // #ifndef VUE3
 Vue.config.productionTip = false

@@ -283,7 +283,7 @@
 			},
 			goBusiness() {
 				uni.navigateTo({
-					url:'/pages/business/business'
+					url:'/pages/business/business?type=1&title=成为推广大使'
 				})
 			},
 			goDiscount() {
@@ -330,9 +330,13 @@
 			changeIden(index,hasAuth, role){
 				//普通用户申请角色未审核成功的，点击切换的角色时，跳出提醒“您还不是XXX，请申请认证”
 				if(hasAuth){
-					this.identity = index;
+					if (this.identity !== index) {
+						this.identity = index;
+					} else {
+						this.identity = 0
+					}
 					this.$api('/person-info', {
-						change_role: index + 1
+						change_role: this.identity + 1
 					}).then(({data}) => {
 						this.user = data.user
 						if (data.user.order_const) {

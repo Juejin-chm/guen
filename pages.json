@@ -1,5 +1,33 @@
 {
 	"pages": [
+		
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+		    "path" : "pages/package/package",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "投放套餐",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		,
+		{
+		    "path" : "pages/message/message",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "消息通知",
+		        "enablePullDownRefresh": false
+		    }
+				
+		    
+		}
+		,
 		{
 			"path": "pages/my/my",
 			"style": {
@@ -7,12 +35,8 @@
 			}
 		}
 		    ,
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "首页"
-			}
-		},
+		
+		
 		
 		{
 		    "path" : "pages/applyBox/applyBox",
@@ -59,16 +83,7 @@
 		}
 		,
 		
-		{
-		    "path" : "pages/message/message",
-		    "style" :                                                                                    
-		    {
-		        "navigationBarTitleText": "消息通知",
-		        "enablePullDownRefresh": false
-		    }
-		    
-		}
-		,
+		
 		
 		{
 		    "path" : "pages/applyDetail/applyDetail",
@@ -203,15 +218,6 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "我的团队",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/package/package",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "投放套餐",
                 "enablePullDownRefresh": false
             }
             

@@ -2,12 +2,11 @@
 	<view>
 		<BarBg :bgtype='0'></BarBg>
 		<CustomBar :barConfig='barConfig'></CustomBar>
-		
 		<view class="otabs">
 			<view :class="[status==1?'cur':'']" @click="clickTab(1)">审核通知</view>
 			<view :class="[status==2?'cur':'']" @click="clickTab(2)">平台消息</view>
 		</view>
-		
+	
 		<view class="box boxhui">
 			<view class="outer">
 				<view class="ex-name flex-between ex-nameul">
@@ -36,44 +35,20 @@
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
-					<!-- <view class="msgli" @tap="cliPop">
-						<view>
-							<view class="dot">申领盒子审核<text class="red">（驳回）</text></view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-					</view>
-					<view class="msgli" @tap="cliPop">
-						<view>
-							<view>申领盒子审核<text class="red">（通过）</text></view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-					</view> -->
+					
 				</view>
 				<!-- 平台消息 -->
 				<view class="msgul" v-else>
-					<!-- <view class="msgli" @tap="goDetail">
-						<view>
-							<view class="dot">平台消息通知标题</view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-					</view> -->
 					<view v-for="item in list" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<!-- <view :class="[item.isread ? 'gold' : 'red']">{{item.title}}</view> -->
 							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
-					<!-- <view class="msgli" @tap="goDetail">
-						<view>
-							<view class="gold">成为广告主审核驳回消息</view>
-						</view>
-						<view class="time">2023/02/12 12:26:54</view>
-					</view> -->
+					
 				</view>
 			</view>
 		</view>
-		
 		<van-popup :show="showPop" round overlay-style="background-color:rgba(0,0,0,0.5)" @close="onClose">
 			<view class="msgpop">
 				<view class="msgul">
@@ -129,13 +104,43 @@
 			}
 		},
 		onLoad() {
-			this.getApplyList()
+			this.init()
 			this.$api('/box-order-msg-status').then(({data}) => {
 				this.applyTab = data
 			})
 		},
-		
+		onReachBottom() {
+			this.getMore(this.curPage)
+		},
 		methods: {
+			getMore() {
+				if (this.list.length >= this.total) {
+					return
+				}
+				this.curPage += 1
+				if (this.status == 2) {
+					this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
+						data.data.forEach(item => {
+							this.list.push(item)
+							this.total = data.total
+						})
+					})
+				}
+				if (this.status == 1) {
+					this.$api('/box-order-msg-list', {search_month: this.date, search_status: this.tabIndex , page: this.curPage}).then(({data}) => {
+						this.list = data.data
+						this.total = data.total
+					})
+				}
+				
+			},
+			init() {
+				if (this.status == 1) {
+					this.getApplyList()
+				} else {
+					this.getList()
+				}
+			},
 			applyTabClick(key) {
 				console.log(key, 'key')
 				this.tabIndex = key
@@ -145,22 +150,19 @@
 				this.showPop = false
 			},
 			// 审核通知
-			async getApplyList(search_month = this.date, search_status = this.tabIndex, page = this.curPage) {
-				await this.$api('/box-order-msg-list', {search_month, search_status, page}).then(({data}) => {
-					// this.applyList = data.data
+			getApplyList(search_month = this.date, search_status = this.tabIndex, page = this.curPage) {
+				this.$api('/box-order-msg-list', {search_month, search_status, page}).then(({data}) => {
 					this.list = data.data
 					this.total = data.total
 				})
-				return this.list
 			},
 			// 平台消息
-			async getList(search_month = this.date, page = this.curPage) {
-				await this.$api('/platform-message-list', {search_month, page}).then(({data}) => {
-					// this.msgList = data.data
+			getList(search_month = this.date, page = this.curPage) {
+				this.curPage = 1
+				this.$api('/platform-message-list', {search_month, page}).then(({data}) => {
 					this.list = data.data
 					this.total = data.total
 				})
-				return this.list
 			},
 			cliPop(id){
 				if (this.status == 1) {

@@ -35,7 +35,11 @@
 				</view>
 			</van-cell>
 			<view style="height: 10px;"></view>
-			<van-cell class='h' title="电话咨询" :value="phone" />
+			<van-cell class='h' title="电话咨询" :value="phone"  @click="callPhone(phone)">
+				<view slot="right-icon">
+					<image src="../../static/image/tel.png" mode="" style="width: 32rpx;height: 32rpx;margin-left: 10rpx;"></image>
+				</view>
+			</van-cell>
 			<!-- <van-field label="收货人" placeholder="请输入" /> -->
 			
 		</van-cell-group>

@@ -13,7 +13,7 @@
 				<view class="ex-name flex-between">
 					<view class="le">订单通知</view>
 					<view class="timer">
-						<picker mode="date" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
 							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
 						</picker>
@@ -119,6 +119,15 @@
 				this.$api('/platform-message-list', {search_month}).then(({data}) => {
 					this.msgList = data.data
 				})
+			},
+			
+			bindDateChange(e) {
+				this.date = e.detail.value
+				if (this.status == 1) {
+					this.getList()
+				} else {
+					this.getMsgList()
+				}
 			},
 			getList(search_month) {
 				this.$api('/ggz-order-msg-list', {

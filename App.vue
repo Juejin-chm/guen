@@ -107,7 +107,7 @@
 	}
 
 	.hasbtnpad {
-		padding-bottom: 140rpx;
+		padding-bottom: 240rpx;
 	}
 
 	.btn {

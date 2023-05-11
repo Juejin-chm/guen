@@ -6,7 +6,7 @@
 		<form @submit="submit">
 			<van-cell-group inset class="v-group" :border='false'>
 				<van-field label="姓名" placeholder="请输入" @change="(e) => formData.name = e.detail" />
-				<van-field label="联系电话" placeholder="请输入" @change="(e) => formData.mobile = e.detail" />
+				<van-field label="联系电话" placeholder="请输入" maxlength="11" @change="(e) => formData.mobile = e.detail" />
 				<van-field label="门店名称" placeholder="请输入" v-if="type==0" @change="(e) => formData.bus_store_name = e.detail" />
 				
 				<template v-if='type===1'>
@@ -20,7 +20,7 @@
 							</van-radio>
 						</van-radio-group>
 					</van-cell>
-					<van-field class="vfield-line" placeholder="请输入上级推广码" @change="(e) => formData.ds_top_code = e.detail" :disabled="radio === '1'" />
+					<van-field v-show="radio == '0'" class="vfield-line" placeholder="请输入上级推广码" @change="(e) => formData.ds_top_code = e.detail" :disabled="radio === '1'" />
 				</template>
 				
 				<template v-if="type!=2">
@@ -169,7 +169,6 @@
 				  sourceType: ['album', 'camera'],
 				  camera: 'back',
 				  success:(res)=>{
-						console.log(res, 'res............')
 						this[`src${e}`] = res.tempFiles[0].tempFilePath;
 						uni.uploadFile({
 							url: 'http://guen_czd.juejinvr.cn:8089/api/upload-img',
@@ -182,7 +181,6 @@
 								file: res.tempFiles[0].tempFilePath
 							},
 							success: (res) => {
-								console.log(JSON.parse(res.data).data.path, '1234o');
 								this[`src${e}`] = JSON.parse(res.data).data.path
 							}
 						})
