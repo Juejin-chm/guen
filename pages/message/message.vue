@@ -3,7 +3,7 @@
 		<BarBg :bgtype='0'></BarBg>
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		<view class="otabs">
-			<view :class="[status==1?'cur':'']" @click="clickTab(1)">审核通知</view>
+			<view v-if="!isOnlyPlatformMsg" :class="[status==1?'cur':'']" @click="clickTab(1)">审核通知</view>
 			<view :class="[status==2?'cur':'']" @click="clickTab(2)">平台消息</view>
 		</view>
 	
@@ -31,7 +31,7 @@
 				<view class="msgul" v-if="status==1">
 					<view v-for="item in list" class="msgli" :key="item.id" @tap="cliPop(item.id)">
 						<view>
-							<view :class="{dot: !item.isread}">{{item.title}}<text :class="[item.status == 1 ? 'green' : 'red']">（{{item.status == 1 ? '通过' : '驳回'}}）</text></view>
+							<view :class="{dot: !item.isread}">{{item.title}}<text :class="[item.order_status == 2 ? 'green' : 'red']">（{{ item.order_status_txt }}）</text></view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
@@ -39,9 +39,9 @@
 				</view>
 				<!-- 平台消息 -->
 				<view class="msgul" v-else>
-					<view v-for="item in list" :key="item.id" class="msgli" @tap="goDetail(item.id)">
+					<view v-for="(item, idx) in list" :key="item.id" class="msgli" @tap="goDetail(item.id, idx)">
 						<view>
-							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
+							<view :class="{'dot gold': !item.isread }">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
@@ -100,14 +100,24 @@
 				applyTab: [],
 				list: [],
 				curPage: 1,
-				total: 0
+				total: 0,
+				isOnlyPlatformMsg: false
 			}
 		},
-		onLoad() {
-			this.init()
+		onLoad(options) {
+			console.log(options, 'options......')
+			if (options.isNotRole == 0) {
+				this.isOnlyPlatformMsg = true
+				this.status = 2
+			} else {
+				// this.$api('/box-order-msg-status').then(({data}) => {
+				// 	this.applyTab = data
+				// })
+			}
 			this.$api('/box-order-msg-status').then(({data}) => {
 				this.applyTab = data
 			})
+			this.init()
 		},
 		onReachBottom() {
 			this.getMore(this.curPage)
@@ -151,6 +161,11 @@
 			},
 			// 审核通知
 			getApplyList(search_month = this.date, search_status = this.tabIndex, page = this.curPage) {
+				// TODO
+				if (this.isOnlyPlatformMsg) {
+					this.list = []
+					return
+				}
 				this.$api('/box-order-msg-list', {search_month, search_status, page}).then(({data}) => {
 					this.list = data.data
 					this.total = data.total
@@ -176,7 +191,8 @@
 					})
 				}
 			},
-			goDetail(id){
+			goDetail(id, idx){
+				this.list[idx].isread = true
 				uni.navigateTo({
 					url:'../messageDetail/messageDetail?id=' + id
 				})

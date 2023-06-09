@@ -60,7 +60,7 @@
 				<view class="vcell-code-warp">
 					<van-field placeholder="请输入验证码" :border='false' @change="(e) => formData.code = e.detail">
 						<view slot='right-icon'>
-							<image :src="codeImg"></image>
+							<image :src="codeImg" @click="getCode()"></image>
 						</view>
 					</van-field>
 				</view>
@@ -95,6 +95,7 @@
 				    active: '../../static/image/icon-active.png',
 				},
 				type:0,
+				isParnet: 0,
 				scrollTimer : null,
 				formData: {
 					role_type: '',
@@ -124,13 +125,18 @@
 		
 		onLoad(options) {
 			this.type = parseInt(options.type);
+			this.isParnet = parseInt(options.isParnet)
+			console.log(this.isParnet, '888', options);
 			this.barConfig.title=options.title;
 			
-			this.$api('/get-code').then(({data}) => {
-				this.codeImg = data
-			})
+			this.getCode()
 		},
 		methods: {
+			getCode() {
+				this.$api('/get-code').then(({data}) => {
+					this.codeImg = data
+				})
+			},
 			onChange(e, key) {
 				this.formData[key] = e.detail
 			},
@@ -145,7 +151,24 @@
 					this.formData.ds_identity_pic_negative = this.src2
 				}
 				this.formData.role_type = this.type + 1
-				this.$api('/join-us-form-submit', this.formData).then((data) => {
+				if (this.isParnet == 1) {
+					const { code, name, mobile, ggz_company, remark } = this.formData
+					this.$api('/city-partner', {
+						code,
+						name,
+						mobile,
+						ggz_company,
+						remark
+					}, false).then(() => {
+						uni.showToast({
+							icon: 'none',
+							msg: '提交成功'
+						})
+						uni.navigateBack()
+					})
+					return
+				}
+				this.$api('/join-us-form-submit', this.formData, false).then((data) => {
 					uni.navigateTo({
 						url:'../tip/tip?isError=0'
 					})

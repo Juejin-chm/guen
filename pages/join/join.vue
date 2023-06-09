@@ -35,7 +35,7 @@
 							</view>
 						</view>
 					</navigator>
-					<navigator class="busli" hover-class="none" url="../business/business?type=2&title=成为城市合伙人">
+					<navigator class="busli" hover-class="none" url="../business/business?type=2&title=成为城市合伙人&isParnet=1">
 						<image class="busbg" src="@/static/image/business2.png" mode="widthFix"></image>
 						<view class="buslin">
 							<view class="img">

@@ -32,7 +32,9 @@
 					   <image src="@/static/image/verimg.png"></image>
 					   <swiper :circular='true' :vertical='true' :autoplay='true'>
 							<swiper-item v-for="item in adArr" :key="item">
-								<view class="txthide">{{item}}<text>查看更多</text></view>
+								<view class="txthide">
+									<view @click="viewDetail(item.id)">{{item.title}}</view>
+								<text @click="viewMore">查看更多</text></view>
 							</swiper-item>
 					   </swiper>
 					 </view>
@@ -91,20 +93,23 @@
 				</view>
 				
 				<div class="ad">
-					<image src="@/static/image/adimg.png" mode="widthFix" style="width: 100%;" @click="joinUs"></image>
+					<image :src="joinBanner" mode="widthFix" style="width: 100%;" @click="joinUs"></image>
 				</div>
 				
 				<div class="ititr">
-					<view class="itit"><span>金盒子数据</span></view>
-					<view class="more"><navigator hover-class="none" url="../series/series">更多 &gt;</navigator></view>
+					<view class="itit"><span>餐盒样式</span></view>
+					<view class="more"><navigator hover-class="none" url="../series/series">更多<image src="@/static/image/turn-right.png" class="right-arrow"></image></navigator></view>
 				</div>
 			</view>
+			<view style="padding-bottom: 20px;">
 			<the-series
 				is-swiper
 				:tabArr="tabArr"
 				:boxes="boxes"
+				 :curId="cateId"
 				@tabChange="tabChange"
 			/>
+			</view>
 			<!-- <button open-type="getPhoneNumber">getPhoneNumber</button> -->
 		</view>
 		
@@ -114,7 +119,6 @@
 
 <script>
 import theSeries from '@/component/Series'
-import req from '../../request/index.js'
 	export default {
 		components: { theSeries },
 		data() {
@@ -132,7 +136,7 @@ import req from '../../request/index.js'
 				current:0,
 				adArr:[],
 				tabArr:[],
-				setindex:0,
+				cateId: '',
 				scrollTimer : null,
 				platData: {
 					bgl: 0,
@@ -141,6 +145,7 @@ import req from '../../request/index.js'
 					tgds_count: 0,
 					users_count: 0
 				},
+				joinBanner: '',
 				boxes: [],
 				code: '',
 				phone: ''
@@ -148,14 +153,19 @@ import req from '../../request/index.js'
 		},
 		onLoad() {
 			this.getPageData()
-			// uni.getUserInfo({
-			// 	success(res) {
-			// 		console.log(res, '11111');
-			// 	}
-			// })
 		},
 		methods: {
-			
+			viewDetail(id) {
+				console.log(id, '1111111');
+				uni.navigateTo({
+					url:'../messageDetail/messageDetail?id=' + id
+				})
+			},
+			viewMore() {
+				uni.navigateTo({
+					url: '/pages/message/message?isNotRole=0'
+				})
+			},
 			joinUs() {
 				uni.switchTab({
 					url: '/pages/join/join'
@@ -164,22 +174,22 @@ import req from '../../request/index.js'
 			curChange(e){
 				this.current = e.detail.current;
 			},
-			clitabs(index){
-				this.setindex = index;
-			},
 			getPageData() {
-				req('/index-index').then(data => {
+				this.$api('/index-index').then(data => {
 					const res = data.data
 					this.swiperArr = res.topBanners.map(item => item.url)
-					this.adArr = res.platformNews
+					this.adArr = res.platformNews.length ? res.platformNews : ['暂无新消息']
 					this.tabArr = res.boxCates
 					this.platData = res.platData
 					this.boxes = res.boxes
 					this.phone = res.phone
+					this.cateId = this.tabArr[0].id
+					this.joinBanner = res.joinBanner.url
 				})
 			},
 			tabChange(id) {
-				req('/get-box-by-cate', {
+				this.cateId = id
+				this.$api('/get-box-by-cate', {
 					cate_id: id
 				}).then(({data}) => {
 					this.boxes = data.data
@@ -190,6 +200,11 @@ import req from '../../request/index.js'
 </script>
 
 <style scoped lang="less">
+	.right-arrow {
+		width: 12rpx;
+		height: 21rpx;
+		margin-left: 10rpx;
+	}
 	.swiper{position: relative;overflow: hidden;
 		padding-bottom: 40rpx;
 		margin: 30rpx;

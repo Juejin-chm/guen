@@ -4,6 +4,7 @@ export function login () {
 		const name = uni.getStorageSync('nickname')
 		const avatar = uni.getStorageSync('avatarUrl')
 		const phone = uni.getStorageSync('phone')
+		const invite_user = uni.getStorageSync('scene')
 		if (!name) {
 			uni.showToast({
 				icon: 'none',
@@ -23,15 +24,18 @@ export function login () {
 						name,
 						avatar,
 						phone,
-						code: res.code
+						code: res.code,
+						invite_user
 					}).then(({data}) => {
 						resolve({
 							niackname: name,
 							avatarUrl: avatar,
-							phone: phone
+							phone: phone,
+							now_level: data.now_level
 						})
 						const access_token = data.access_token
 						uni.setStorageSync('access_token', access_token)
+						uni.setStorageSync('now_level', data.now_level)
 					})
 				}
 			}

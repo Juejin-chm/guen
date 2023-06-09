@@ -1,25 +1,24 @@
 
 const defauls = {
-	method: "POST",
-	loading: true
+	method: "POST"
 }
 const baseUrl = 'http://guen_czd.juejinvr.cn:8089/api'
 
-function hideLoading(msg) {
-	uni.hideLoading();
+function hideLoading(msg, loading) {
+	loading && uni.hideLoading();
 	uni.showToast({
-		icon:"error",
-		title: msg
+		icon:"none",
+		title: msg,
+		duration: 3000
 	})
 }
 
 // 全局请求封装
-export default function (path, data = {}, config = defauls) {
-
+export default function (path, data = {}, loading = true) {
 	const token = uni.getStorageSync("access_token");
 	const Authorization = token || "";
 
-	if (config.loading) {
+	if (loading) {
 		uni.showLoading({
 			title: "加载中",
 			mask: true
@@ -33,7 +32,7 @@ export default function (path, data = {}, config = defauls) {
 				'Content-Type': 'application/json'
 			},
 			url: baseUrl + path,
-			method: config.method,
+			method: 'post',
 			data,
 			success(response) {
 				const { code, msg } = response.data
@@ -56,12 +55,12 @@ export default function (path, data = {}, config = defauls) {
 					return reject('请先登录')
 				}
 				if (code == 400) {
-					hideLoading(msg)
-					return reject()
+					hideLoading(msg, loading)
+					return reject('code: ' + code + ',' + msg)
 				}
 				if (code != 200) {
-					hideLoading(msg)
-					return reject()
+					hideLoading(msg, loading)
+					return reject('code: ' + code)
 				}
 				resolve(response.data);
 			},
@@ -74,7 +73,7 @@ export default function (path, data = {}, config = defauls) {
 				reject(err);
 			},
 			complete() {
-				uni.hideLoading();
+				loading && uni.hideLoading();
 			}
 		});
 	});

@@ -13,7 +13,7 @@
 				<view class="h">{{detail.user.ggz_company}}<text>{{detail.user.phone}}</text></view>
 				<view>
 					<image src="@/static/image/address.png"></image>
-					<text>{{detail.user.address}}</text>
+					<text>{{detail.address}}</text>
 				</view>
 			</view>
 			
@@ -47,7 +47,7 @@
 			</view>
 			<view class='cellbor'>
 				<van-cell-group :border="false">
-					<van-cell class="tel" title="电话咨询" :value="detail.phone" :border="false"  @click="callPhone(phone)">
+					<van-cell class="tel" title="电话咨询" :value="detail.phone" :border="false"  @click="callPhone(detail.phone)">
 						<view slot="right-icon">
 							<image src="../../static/image/tel.png" mode=""></image>
 						</view>
@@ -87,5 +87,8 @@
 </style>
 <style scoped lang="less">
 	@import "@/static/style/cell.less";
+	.cellbor.address {
+		padding: 29rpx 34rpx 47rpx;
+	}
 </style>
 

@@ -71,18 +71,16 @@
 			this.curTab = option.key
 			this.$api('/examine-status-title').then(({data}) =>{
 				this.tabs = data
-				this.getList(option.key)
 			})
-			
+			this.getList(option.key)
 		},
 		methods: {
-			async getList(status, month) {
-				
+			getList(status, month) {
 				this.$api('/user-examine-list', {
 					status,
 					search_month: month
 				}).then(({data}) => {
-					this.reviewList = data
+					this.reviewList = data.data
 				})
 			},
 			bindDateChange(e){

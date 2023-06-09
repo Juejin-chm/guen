@@ -6,13 +6,13 @@
 		<view class="outer">
 			<view class="header">
 				<view class="head">
-					<image src="@/static/image/head.png"></image>
+					<image :src="avatarUrl || '/static/image/head.png'"></image>
 					<view>
 						<view class="b name">
 							<button v-if="!access_token" class="phone-number-btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">点击授权登录</button>
 							<template v-else>{{ nickname }}</template>
 						</view>
-						<view class="ul" v-if="identity>0">
+						<view class="ul" style="display: flex;" v-if="identity>0">
 							<view class="li" v-if="identity==1">
 								<image src="@/static/image/n1.png"></image>
 								<text>{{user.role_info.bus_store_name}}</text>
@@ -22,7 +22,7 @@
 									<image src="@/static/image/n1.png"></image>
 									<text>{{ user.role_info.name }}</text>
 								</view>
-								<view class="li">
+								<view class="li" style="margin-top: 0;margin-left: 30rpx;">
 									<image src="@/static/image/n2.png"></image>
 									<text>{{user.role_info.ds_plug_addr}}</text>
 								</view>
@@ -36,7 +36,7 @@
 				</view>
 				<view class="rolename"><image src="@/static/image/switch.png"></image><text>切换角色</text></view>
 				<view class="roles flex-between">
-					<view v-for="(item,index) in idenArr" :key="index" :class="{'cur':identity==(index+1),'opc':identity==0}" @tap="changeIden(index+1,item.hasAuth,item.title)">
+					<view v-for="(item,index) in idenArr" :key="index" :class="{'cur':identity==(index+1),'opc':identity==0}" @tap="changeIden(index+1,item.hasAuth,item.title, item.key)">
 						<image :src="`../../static/image/r${index+1}.png`"></image>
 						<text>{{item.title}}</text>
 					</view>
@@ -182,7 +182,7 @@
 						<image src="../../static/image/mo5.png"></image>
 						<view>投放套餐</view>
 					</view>
-					<navigator url="../message/message" hover-class="none" v-if="identity==0||identity==1">
+					<navigator :url="`../message/message?isNotRole=${identity}`" hover-class="none" v-if="identity==0||identity==1">
 						<image src="../../static/image/mo2.png"></image>
 						<view>消息通知</view>
 						<text v-if="user.no_read_msg_count" class="num">{{user.no_read_msg_count}}</text>
@@ -214,7 +214,7 @@
 					<text>头像：</text>
 					<button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
 					  <image class="avatar" :src="avatarUrl"></image>
-					</button> 
+					</button>
 				</view>
 				<view class="loginfo">
 					<text>昵称:</text>
@@ -237,7 +237,7 @@
 					title:'我的',
 					isCenter:true,
 				},
-				identity:0, //0-无角色 1-商家 2-推广大师 3-广告主
+				identity: uni.getStorageSync('now_level') && (+uni.getStorageSync('now_level') - 1) || 0, //0-无角色 1-商家 2-推广大师 3-广告主
 				idenArr:[{
 					icon:'../../static/image/r1.png',
 					iconAct:'../../static/image/r1-1.png',
@@ -266,25 +266,37 @@
 				orderList: []
 			}
 		},
-		onLoad() {
+		onLoad(options) {
+			console.log(options, 'my options')
+			const scene = decodeURIComponent(options.scene)
+			console.log(scene, 'scene...')
+			if (scene) {
+				uni.setStorageSync('scene', scene)
+			}
 			const token = uni.getStorageSync("access_token")
 			if (token) {
 				this.getRoleList()
 			}
-			
+		},
+		onShow() {
+			this.getPersonInfo()
 		},
 		methods: {
 			getRoleList() {
 				this.$api('/role-list').then(({data}) => {
 					this.idenArr[0].hasAuth = data[1].has_role
+					this.idenArr[0].title = data[1].val
+					this.idenArr[0].key = data[1].key
 					this.idenArr[1].hasAuth = data[2].has_role
+					this.idenArr[1].title = data[2].val
+					this.idenArr[1].key = data[2].key
 					this.idenArr[2].hasAuth = data[3].has_role
+					this.idenArr[2].title = data[3].val
+					this.idenArr[2].key = data[3].key
 				})
 			},
 			goBusiness() {
-				uni.navigateTo({
-					url:'/pages/business/business?type=1&title=成为推广大使'
-				})
+				this.goToForm(4)
 			},
 			goDiscount() {
 				uni.navigateTo({
@@ -292,7 +304,6 @@
 				})
 			},
 			push() {
-				// this.$api('/user-share-page')
 				uni.navigateTo({
 					url: '/pages/poster/poster'
 				})
@@ -301,11 +312,32 @@
 				const { value: nickname } = e.detail
 				uni.setStorageSync('nickname', nickname)
 			},
-			onChooseAvatar(e) {
+			getAvatar(tempFilePath) {
+				return new Promise((resolve, rej) => {
+					uni.uploadFile({
+						url: 'http://guen_czd.juejinvr.cn:8089/api/upload-img',
+						filePath: tempFilePath,
+						name: 'file',
+						header: {
+							Authorization: uni.getStorageSync('access_token')
+						},
+						formData: {
+							file: tempFilePath
+						},
+						success: (res) => {
+							const path = JSON.parse(res.data).data.path
+							resolve(path)
+						}
+					})
+				})
+				
+			},
+			async onChooseAvatar(e) {
 				const { avatarUrl } = e.detail
-				if (avatarUrl) {
-					this.avatarUrl = avatarUrl
-					uni.setStorageSync('avatarUrl', avatarUrl)
+				const path = await this.getAvatar(avatarUrl);
+				if (path) {
+					this.avatarUrl = path
+					uni.setStorageSync('avatarUrl', path)
 				}
 			},
 			async getPhoneNumber(e) {
@@ -322,12 +354,20 @@
 					this.nickname = data.niackname
 					this.avatarUrl = data.avatarUrl
 					this.showAuth = false
-					console.log(data, this.nickname, '00data')
 					this.access_token = uni.getStorageSync('access_token')
+					this.identity = data.now_level - 1
 					this.getRoleList()
+					this.getPersonInfo()
 				})
 			},
-			changeIden(index,hasAuth, role){
+			changeIden(index,hasAuth, role, key){
+				if (!this.access_token) {
+					return uni.showToast({
+						icon: 'none',
+						title: '您还未登录，请先登录'
+					})
+					
+				}
 				//普通用户申请角色未审核成功的，点击切换的角色时，跳出提醒“您还不是XXX，请申请认证”
 				if(hasAuth){
 					if (this.identity !== index) {
@@ -335,30 +375,48 @@
 					} else {
 						this.identity = 0
 					}
-					this.$api('/person-info', {
-						change_role: this.identity + 1
-					}).then(({data}) => {
-						this.user = data.user
-						if (data.user.order_const) {
-						 this.orderList = data.user.order_const.map((item, index) => {
-							 item.src = `../../static/image/order${index + 1}.png`
-							 return item
-						 })
-						}
-					})
+					this.getPersonInfo()
 				}else{
 					uni.showModal({
 						title: '提示',
 						content: `您还不是${role}，请申请认证`,
-						success: function (res) {
+						success:  (res) => {
 							if (res.confirm) {
-								console.log('用户点击确定');
+								console.log('用户点击确定', key);
+								this.goToForm(key)
 							} else if (res.cancel) {
 								console.log('用户点击取消');
 							}
 						}
 					});
 				}
+			},
+			getPersonInfo() {
+				this.$api('/person-info', {
+					change_role: this.identity + 1
+				}).then(({data}) => {
+					this.user = data.user
+					uni.setStorageSync('now_level', data.user.now_level)
+					if (data.user.order_const) {
+					 this.orderList = data.user.order_const.map((item, index) => {
+						 item.src = `../../static/image/order${index + 1}.png`
+						 return item
+					 })
+					}
+				})
+			},
+			goToForm(role) {
+				let url = ''
+				if (role == 2) {
+					url = '../business/business?type=0&title=商家入驻'
+				}
+				if (role == 3) {
+					url = '../business/business?type=1&title=成为推广大使'
+				}
+				if (role == 4) {
+					url = '../business/business?type=2&title=我要投广告'
+				}
+				uni.navigateTo({ url })
 			},
 			goApply(key){
 				uni.navigateTo({

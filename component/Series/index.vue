@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="setabs">
-			<view :class="setindex == index ? 'cur' : ''" v-for="(item, index) in tabArr" :key="item.id" @tap="clitabs(index, item.id)">{{ item.name }}</view>
+			<view  v-for="(item, index) in tabArr" :key="item.id" :class="curId == item.id ? 'cur' : ''" @tap="clitabs(item.id)">{{ item.name }}</view>
 		</view>
 		<view class="outer">
 			<view v-if="isSwiper" class="setul">
@@ -38,20 +38,19 @@ export default {
 		boxes: {
 			atype: Array,
 			default: () => []
-		}
+		},
+		curId: String
   },
 	data() {
 		return {
-			setindex:0	
 		}
 	},
-
+	
 	methods: {
 			curChange(e){
 				this.current = e.detail.current;
 			},
-			clitabs(index, id){
-				this.setindex = index;
+			clitabs(id){
 				this.$emit('tabChange', id)
 			},
 		}

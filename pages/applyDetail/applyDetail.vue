@@ -98,8 +98,8 @@
 			
 		},
 		onLoad(query) {
-			this.$api('/user-examine-detail/' + 12 || query.id).then(({data}) => {
-				console.log(data, 'data,,,,,,,,,');
+			this.$api('/user-examine-detail/' + query.id).then(({data}) => {
+				console.log(data, 'user-examine-detail');
 				this.detail = data.detail
 				this.phone = data.phone
 			})

@@ -15,8 +15,12 @@
 		},
 		data() {
 			return {
-				
+				navH: 0
 			}
+		},
+		mounted() {
+			const navH = getApp().globalData.navHeight
+			this.navH = navH
 		},
 		methods: {
 			
@@ -25,7 +29,8 @@
 </script>
 
 <style scoped lang="less">
-	.barbg{position: fixed;top: 0;left: 0;right: 0;
-		image{width: 100%;}
+	// .barbg{position: fixed;top: 0;left: 0;right: 0;
+	.barbg{position: absolute;top: 0;left: 0;right: 0;
+		image{width: 750rpx;height: 660rpx;}
 	}
 </style>

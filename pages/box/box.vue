@@ -25,7 +25,7 @@
 				    <van-cell-group :border="false">
 						<van-cell is-link :url='`/pages/boxDetail/boxDetail?id=${item.id}`' class='h'>
 							<view slot="title" class="title">
-								<text>订单号：</text>{{item.order_sn}}
+								<text>订单号：</text><view  class="order-sn" style="">{{item.order_sn}}</view>
 							</view>
 							<view :class="{red: item.transport_status == 1, theme: item.transport_status == 2, done: item.transport_status == 3}">{{item.transport_status_txt}}</view>
 						</van-cell>
@@ -62,8 +62,8 @@
 					title:'盒子订单',
 					hasRetun:true,
 					isCenter:true,
-					date:null,
 				},
+				date:'',
 				tabs: [],
 				curTab: 'all',
 				list: [],
@@ -155,6 +155,9 @@
 </style>
 <style scoped lang="less">
 	@import "@/static/style/cell.less";
+	.order-sn {
+		width: 310rpx;display: inline-block;overflow: hidden;text-overflow: ellipsis;vertical-align: bottom;
+	}
 	.theme {
 		color: #CBA868;
 	}

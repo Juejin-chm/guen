@@ -16,6 +16,7 @@
 				}
 			})
 		},
+		
 		methods: {
 			
 		
@@ -25,7 +26,16 @@
 
 <style lang="less">
 	@import "@/wxcomponents/dist/common/index.wxss";
-
+	
+	::-webkit-scrollbar{
+	
+	  display: none;
+	
+	}
+	view.van-cell {
+		
+		padding: var(--cell-vertical-padding,32rpx) var(--cell-horizontal-padding,16px);
+	}
 	page {
 		font-size: 28rpx;
 		color: #111111;

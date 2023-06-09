@@ -46,7 +46,9 @@
 		
 		<view class="fixedbtn">
 			<view class="envpad">
-				<button class="btn" form-type="submit" @click="submit">联系客服</button>
+				<button class="btn" form-type="submit" open-type="contact" @click="submit">
+					联系客服
+				</button>
 			</view>
 		</view>
 	</view>
@@ -85,6 +87,9 @@
 			})
 		},
 		methods: {
+			submit() {
+				
+			},
 			curChange(e) {
 				
 			}

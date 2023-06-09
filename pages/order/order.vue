@@ -21,10 +21,10 @@
 						</picker>
 					</view>
 				</view>
-				
-				<view v-for="item in list" :key="item.id" :class="['cellbor', {cellborhui: item.order_status == 3}]">
+				<template v-if="list.length > 0">
+				<view v-for="item in list" :key="item.id" :class="['cellbor', {cellborhui: item.order_status == 3}]" @click="goDetail(item.id)">
 				    <van-cell-group :border="false">
-						<van-cell is-link :url='`/pages/orderDetail/orderDetail?id=${item.id}`' class='h'>
+						<van-cell is-link  class='h'>
 							<view slot="title">
 								<text>订单号：</text>{{item.order_sn}}
 							</view>
@@ -32,7 +32,7 @@
 						</van-cell>
 						<view class="space">
 							<van-cell title="盒子总数量：" :value="item.number" :border="false" />
-							<van-cell title="投放套餐：" value="" :border="false" />
+							<!-- <van-cell title="投放套餐：" value="" :border="false" /> -->
 							<van-cell title="投放开始-结束：" :value="item.format_period" :border="false" />
 							<van-cell title="价格：" :border="false">
 								<view style="color: #ff5050;">￥{{item.money}}</view>
@@ -40,6 +40,11 @@
 						</view>
 				    </van-cell-group>
 				</view>
+				</template>
+				<template v-else>
+					<view style="height: 300rpx ;"></view>
+				</template>
+				
 				
 				
 				
@@ -70,9 +75,14 @@
 				console.log(data, 'data');
 				this.tabs = data
 			})
-			this.getList(option.key)
+			this.getList(this.curTab)
 		},
 		methods: {
+			goDetail(id) {
+				uni.navigateTo({
+					url: '/pages/orderDetail/orderDetail?id=' + id
+				})
+			},
 			getList(status, month) {
 				this.$api('/order-list', {
 					search_status: status,

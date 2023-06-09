@@ -171,9 +171,13 @@
 				console.log(this.boxInfo, this.boxNumber, this.cateNameList, this.checkedBox, '--0');
 				for (let key in this.checkedBox) {
 					this.checkedBox[key].forEach((item, index) => {
+						// if(!this.boxNumber[key][index]) {
+						// 	throw('')
+						// }
 						order_goods.push({ id: this.delId(item, true), number: this.boxNumber[key][index] })
 					})
 				}
+				
 				console.log(order_goods, 'order_goods---------');
 				// return
 				const formData = {
@@ -274,7 +278,8 @@
 	.scroll-view {
 		border: 1px solid #e2e2e2;
 		margin: 14rpx 0;
-		height: 200rpx;
+		// height: 200rpx;
+		max-height: 600rpx;
 		padding: 10rpx;
 		box-sizing: border-box;
 	}
