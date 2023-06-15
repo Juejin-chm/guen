@@ -171,15 +171,21 @@
 				console.log(this.boxInfo, this.boxNumber, this.cateNameList, this.checkedBox, '--0');
 				for (let key in this.checkedBox) {
 					this.checkedBox[key].forEach((item, index) => {
-						// if(!this.boxNumber[key][index]) {
-						// 	throw('')
-						// }
+						if(!(this.boxNumber[key] && this.boxNumber[key][index])) {
+							if (!(this.boxNumber[key][index] > 1)) {
+								uni.showToast({
+									icon: 'none',
+									title: '请填写大于0的盒子数量'
+								})
+							}
+							throw('this.boxNumber 有问题')
+						}
 						order_goods.push({ id: this.delId(item, true), number: this.boxNumber[key][index] })
 					})
 				}
 				
 				console.log(order_goods, 'order_goods---------');
-				// return
+				return
 				const formData = {
 					store_name: this.boxInfo.company,
 					order_goods: order_goods,

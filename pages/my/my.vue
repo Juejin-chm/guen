@@ -65,12 +65,12 @@
 				
 				<template v-if="identity==1">
 					<view class="column flex-between">
-						<navigator class="column-li column-1" url="../applyBox/applyBox">
+						<view class="column-li column-1" @click="gotoApplyBox">
 							<view class="txt">申请领取盒子
 								<image class="ri" src="@/static/image/turn-right.png"></image>
 							</view>
 							<image class="ico ico1" src="@/static/image/column1.png"></image>
-						</navigator>
+						</view>
 						<view class="columns">
 							<view class="column-li">
 								<view>总盒子数量</view>
@@ -331,6 +331,18 @@
 					})
 				})
 				
+			},
+			gotoApplyBox() {
+				if (!this.user.has_no_finish_order) {
+					return uni.showToast({
+						icon: 'none',
+						title: '有未确认的订单，不能申请盒子',
+						duration: 3000
+					})
+				}
+				uni.navigateTo({
+					url: '/pages/applyBox/applyBox'
+				})
 			},
 			async onChooseAvatar(e) {
 				const { avatarUrl } = e.detail
