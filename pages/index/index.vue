@@ -151,8 +151,15 @@ import theSeries from '@/component/Series'
 				phone: ''
 			}
 		},
-		onLoad() {
+		onLoad(options) {
 			this.getPageData()
+			
+			console.log(options, 'my options')
+			const scene = decodeURIComponent(options.scene)
+			console.log(scene, 'scene...')
+			if (scene) {
+				uni.setStorageSync('scene', scene)
+			}
 		},
 		methods: {
 			viewDetail(id) {

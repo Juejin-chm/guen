@@ -277,11 +277,30 @@
 			if (token) {
 				this.getRoleList()
 			}
+			// this.scanCode()
 		},
 		onShow() {
 			this.getPersonInfo()
 		},
 		methods: {
+			scanCode() {
+				// 允许从相机和相册扫码
+				uni.scanCode({
+					scanType: ['qrCode'],
+					success: function(res) {
+						// 微信小程序
+						if (res.errMsg == "scanCode:ok") {
+							// 扫描到的信息
+							console.log(res, '扫码返回的结果')
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '二维码扫描失败'
+							})
+						}
+					}
+				});
+			},
 			getRoleList() {
 				this.$api('/role-list').then(({data}) => {
 					this.idenArr[0].hasAuth = data[1].has_role
@@ -332,8 +351,10 @@
 				})
 				
 			},
+			
+			
 			gotoApplyBox() {
-				if (!this.user.has_no_finish_order) {
+				if (this.user.has_no_finish_order) {
 					return uni.showToast({
 						icon: 'none',
 						title: '有未确认的订单，不能申请盒子',

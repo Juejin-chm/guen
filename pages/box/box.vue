@@ -55,6 +55,7 @@
 </template>
 
 <script>
+	import { getParameter } from '@/tools'
 	export default {
 		data() {
 			return {
@@ -80,6 +81,9 @@
 			this.$api('/box-order-transport-status').then(({data}) => {
 				this.tabs = data
 			})
+			// this.getList(this.curTab, this.date)
+		},
+		onShow() {
 			this.getList(this.curTab, this.date)
 		},
 		methods: {
@@ -107,7 +111,7 @@
 			copy(text) {
 				uni.setClipboardData({
 				  data: text,
-				  success: function (res) {
+				  success:  (res) => {
 				    uni.getClipboardData({
 				      success: function (res) {
 				        uni.showToast({
@@ -118,14 +122,70 @@
 				  },
 				});
 			},
-		
+			scanCode() {
+				uni.scanCode({
+					success: (res) => {
+						// 微信小程序
+						if (res.errMsg == "scanCode:ok") {
+							// 扫描到的信息
+							const id = getParameter('id', res.path)
+							console.log(res, id, '扫码返回的结果 和 id')
+							if (id) {
+								this.done(id)
+							}
+							// else {
+							// 	setTimeout(() => {
+							// 		uni.showToast({ icon: 'none', title: '未获取到id', duration: 2000 })
+							// 	}, 300)
+							// }
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '扫码失败'
+							})
+						}
+					}
+				});
+			},
+			beforeDone() {
+				uni.showModal({
+					title: '提示',
+					content: '需扫码才能确认收货',
+					success: (res) => {
+						if (res.confirm) {
+							this.scanCode()
+						}
+					}
+				})
+			},
+			done(id) {
+				this.$api('/confirm-finish-order/' + id).then(({data}) => {
+					// this.detail = data.order
+					uni.showToast({
+						icon: 'none',
+						title: '提交成功'
+					})
+					this.getList(this.curTab, this.date)
+				})
+			},
 			async delOrder(status, id) {
 				if (status == 2) {
-					await this.$api('/confirm-finish-order/' + id)
+					// await this.$api('/confirm-finish-order/' + id)
+					this.beforeDone()
 				} else {
-					await this.$api('/del-bus-order/' + id)
+					uni.showModal({
+						title: '提示',
+						content: '是否删除订单？',
+						success: (res) => {
+							if (res.confirm) {
+								this.$api('/del-bus-order/' + id).then(data => {
+									this.getList(this.curTab, this.date)
+								})
+							}
+						}
+					})
 				}
-				this.getList(this.curTab, this.date)
+				// this.getList(this.curTab, this.date)
 			},
 			async getList() {
 				this.curPage = 1

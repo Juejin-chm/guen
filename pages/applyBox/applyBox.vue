@@ -171,21 +171,19 @@
 				console.log(this.boxInfo, this.boxNumber, this.cateNameList, this.checkedBox, '--0');
 				for (let key in this.checkedBox) {
 					this.checkedBox[key].forEach((item, index) => {
-						if(!(this.boxNumber[key] && this.boxNumber[key][index])) {
-							if (!(this.boxNumber[key][index] > 1)) {
-								uni.showToast({
-									icon: 'none',
-									title: '请填写大于0的盒子数量'
-								})
-							}
+						if (!this.boxNumber[key]) {
+							uni.showToast({ icon: 'none', title: '盒子数量不能为空' })
 							throw('this.boxNumber 有问题')
+						}
+						if (!(this.boxNumber[key][index] > 0)) {
+							uni.showToast({ icon: 'none', title: '请填写大于0的盒子数量' })
+							throw('请填写大于0的盒子数量')
 						}
 						order_goods.push({ id: this.delId(item, true), number: this.boxNumber[key][index] })
 					})
 				}
 				
-				console.log(order_goods, 'order_goods---------');
-				return
+				console.log(order_goods, '-----order_goods---------');
 				const formData = {
 					store_name: this.boxInfo.company,
 					order_goods: order_goods,
@@ -197,7 +195,18 @@
 					detail_addr: this.detail_addr,
 					remark: this.remark
 				}
-				
+				if (!order_goods?.length) {
+					return uni.showToast({ icon: 'none', title: '请选择盒子' })
+				}
+				if (!formData.consignee) {
+					return uni.showToast({ icon: 'none', title: '收货人未填写' })
+				}
+				if (!formData.phone) {
+					return uni.showToast({ icon: 'none', title: '联系电话未填写' })
+				}
+				if (!formData.province || !formData.city || !formData.county || !formData.detail_addr) {
+					return uni.showToast({ icon: 'none', title: '收获地址未填写完整' })
+				}
 				this.$api('/bus-create-order', formData).then((data) => {
 					if (data.code == 405) {
 						return uni.redirectTo({ url: '/pages/tip/tip?isError=1' })

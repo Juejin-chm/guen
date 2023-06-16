@@ -65,7 +65,7 @@
 			</view>
 			<view class='cellbor'>
 				<van-cell-group :border="false">
-					<van-cell class="tel" title="电话咨询" :value="phone" :border="false"  @click="callPhone(phone)">
+					<van-cell class="tel" title="电话咨询" :value="phone" :border="false" @click="callPhone(phone)">
 						<view slot="right-icon">
 							<image src="../../static/image/tel.png" mode=""></image>
 						</view>
@@ -76,7 +76,7 @@
 		
 		<view class="fixedbtn" v-if="detail.transport_status==2">
 			<view class="envpad">
-				<button class="btn" @click="done">确认完成</button>
+				<button class="btn" @click="beforeDone">确认完成</button>
 			</view>
 		</view>
 		
@@ -84,6 +84,7 @@
 </template>
 
 <script>
+	import { getParameter } from '@/tools'
 	export default {
 		data() {
 			return {
@@ -99,17 +100,7 @@
 		},
 		onLoad(options) {
 			this.status = options.status;
-			// switch(options.status){
-			// 	case 1:
-			// 	this.barConfig.title = '未派送订单';
-			// 	break;
-			// 	case 2:
-			// 	this.barConfig.title = '订单已派送';
-			// 	break;
-			// 	case 3:
-			// 	this.barConfig.title = '订单已完成';
-			// 	break;
-			// }
+			
 			this.$api('/box-order-info/' + options.id).then(({data, code})=> {
 				
 				this.detail = data.order
@@ -132,11 +123,52 @@
 				        },
 				      });
 			},
-			done() {
-				this.$api('/confirm-finish-order/' + this.detail.id).then(({data}) => {
-					this.detail = data.order
+			beforeDone() {
+				uni.showModal({
+					title: '提示',
+					content: '需扫码才能确认收货',
+					success: (res) => {
+						if (res.confirm) {
+							this.scanCode()
+						}
+					}
 				})
-			}
+			},
+			done(id) {
+				this.$api('/confirm-finish-order/' + id).then(({data}) => {
+					this.detail = data.order
+					uni.showToast({
+						icon: 'none',
+						title: '提交成功'
+					})
+				})
+			},
+			scanCode() {
+				// 允许从相机和相册扫码
+				uni.scanCode({
+					success: (res) => {
+						// 微信小程序
+						if (res.errMsg == "scanCode:ok") {
+							// 扫描到的信息
+							const id = getParameter('id', res.path)
+							console.log(res, id, '扫码返回的结果 和 id')
+							if (id) {
+								this.done(id)
+							}
+							// else {
+							// 	setTimeout(() => {
+							// 		uni.showToast({ icon: 'none', title: '未获取到id', duration: 2000 })
+							// 	}, 300)
+							// }
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: '扫码失败'
+							})
+						}
+					}
+				});
+			},
 		}
 	}
 </script>

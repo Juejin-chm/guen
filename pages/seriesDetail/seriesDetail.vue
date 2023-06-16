@@ -4,7 +4,7 @@
 		
 		<view class="swiper">
 			<swiper :indicator-dots="true" indicator-color="rgba(255,255,255,0.7)" indicator-active-color="rgba(255,255,255,1)" :autoplay="true" style="height: 750rpx;">
-				<swiper-item v-for="item in boxData.imgs">
+				<swiper-item v-for="(item, index) in boxData.imgs" :key="index">
 					<image :src="item.img" mode="widthFix"></image>
 				</swiper-item>
 			</swiper>
