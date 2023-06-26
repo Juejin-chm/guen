@@ -13,9 +13,9 @@
 				<view class="ex-name flex-between">
 					<view class="le">订单通知</view>
 					<view class="timer">
-						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='query.search_month' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
-							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
+							<text :class="[query.search_month?'hei':'']">{{query.search_month?query.search_month:'请选择'}}</text>
 						</picker>
 					</view>
 				</view>
@@ -47,22 +47,22 @@
 				<view class="msgul">
 					<view class="msgli">
 						<view>
-							<view>您有新的订单通知</text></view>
+							<view>{{ ggzDetail.title }}</text></view>
 						</view>
-						<view class="time">2023/02/12 12:26:54</view>
+						<view class="time">{{ ggzDetail.start_date }}</view>
 					</view>
 				</view>
 				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space">
-							<van-cell title="订单号：" :border='false' value="4455336"/>
-							<van-cell title="盒子总数量：" :border='false' value="10000"/>
-							<van-cell title="投放套餐：" :border='false' value="套餐一"/>
-							<van-cell title="投放日期：" :border='false' value="2023/01/01-2023/12/31"/>
+							<van-cell title="订单号：" :border='false' :value="ggzDetail.order_sn"/>
+							<van-cell title="盒子总数量：" :border='false' :value="ggzDetail.number"/>
+							<!-- <van-cell title="投放套餐：" :border='false' :value="套餐一"/> -->
+							<van-cell title="投放日期：" :border='false' :value="ggzDetail.format_period"/>
 							<van-cell title="价格：" :border='false'>
-								<view style="color: #ff5050;">￥2000</view>
+								<view style="color: #ff5050;">￥{{ ggzDetail.money }}</view>
 							</van-cell>
-							<van-cell title="状态：" :border='false' value='待投放'/>
+							<van-cell title="状态：" :border='false' :value='ggzDetail.format_status'/>
 						</view>
 					</van-cell-group>
 				</view>
@@ -81,16 +81,45 @@
 					hasRetun:true,
 					isCenter:true,
 				},
+				ggzDetail: {},
 				showPop:false,
 				status:1, //1-订单通知  2-平台消息
 				list: [],
-				msgList: []
+				msgList: [],
+				query: {
+					page: 1,
+					search_month: ''
+				}
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
+		onReachBottom() {
+			// this.getMore(this.curPage)
+		},
 		methods: {
+			// getMore() {
+			// 	if (this.list.length >= this.total) {
+			// 		return
+			// 	}
+			// 	this.curPage += 1
+			// 	if (this.status == 2) {
+			// 		this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
+			// 			data.data.forEach(item => {
+			// 				this.list.push(item)
+			// 				this.total = data.total
+			// 			})
+			// 		})
+			// 	}
+			// 	if (this.status == 1) {
+			// 		this.$api('/box-order-msg-list', {search_month: this.date, search_status: this.tabIndex , page: this.curPage}).then(({data}) => {
+			// 			this.list = data.data
+			// 			this.total = data.total
+			// 		})
+			// 	}
+				
+			// },
 			tabClick(v) {
 				this.status = v
 				if (v == 1) {
@@ -106,22 +135,24 @@
 			},
 			
 			bindDateChange(e) {
-				this.date = e.detail.value
+				this.query.search_month = e.detail.value
+				this.query.page = 1
 				if (this.status == 1) {
 					this.getList()
 				} else {
 					this.getMsgList()
 				}
 			},
-			getList(search_month) {
-				this.$api('/ggz-order-msg-list', {
-					search_month
-				}).then(({data}) => {
+			getList(query = this.query) {
+				this.$api('/ggz-order-msg-list', query).then(({data}) => {
 					this.list = data.data
 				})
 			},
-			cliPop(){
+			cliPop(id){
 				this.showPop = true
+				this.$api('/ggz-order-msg-detail/' + id).then(({data}) => {
+					this.ggzDetail = data
+				})
 			},
 			goDetail(id){
 				uni.navigateTo({

@@ -137,8 +137,14 @@
 				<template v-if="identity==3">
 					<view class="column">
 						<view class="column-li column-2">
-							<view>曝光度</view>
-							<view class="b">{{user.exposure}}</view>
+							<view class="percentage-text">曝光进度</view>
+							<view class="b percentage-value">{{user.percentage}}</view>
+							<view class="percentage-bar">
+								<text class="percentage-num">{{ user.exposure }}</text>
+								<text class="percentage-num-r">{{ user.total_exposure }}</text>
+								<text class="percentage-bar__left" :style="{width: user.exposure / user.total_exposure * 100 + '%'}"></text>
+								<!-- <text class="percentage-bar__right"></text> -->
+							</view>
 							<image class="ico ico3" src="@/static/image/column3.png"></image>
 						</view>
 					</view>
@@ -272,15 +278,21 @@
 			console.log(scene, 'scene...')
 			if (scene) {
 				uni.setStorageSync('scene', scene)
-			}
-			const token = uni.getStorageSync("access_token")
-			if (token) {
-				this.getRoleList()
-			}
+			}			
 			// this.scanCode()
 		},
 		onShow() {
-			this.getPersonInfo()
+			const token = uni.getStorageSync("access_token")
+			if (token) {
+				this.getRoleList()
+				this.getPersonInfo()
+			} else {
+				uni.showToast({
+					icon: 'none',
+					title: '请先登录'
+				})
+			}
+			
 		},
 		methods: {
 			scanCode() {
@@ -354,13 +366,13 @@
 			
 			
 			gotoApplyBox() {
-				if (this.user.has_no_finish_order) {
-					return uni.showToast({
-						icon: 'none',
-						title: '有未确认的订单，不能申请盒子',
-						duration: 3000
-					})
-				}
+				// if (this.user.has_no_finish_order) {
+				// 	return uni.showToast({
+				// 		icon: 'none',
+				// 		title: '有未确认的订单，不能申请盒子',
+				// 		duration: 3000
+				// 	})
+				// }
 				uni.navigateTo({
 					url: '/pages/applyBox/applyBox'
 				})
@@ -388,7 +400,9 @@
 					this.avatarUrl = data.avatarUrl
 					this.showAuth = false
 					this.access_token = uni.getStorageSync('access_token')
-					this.identity = data.now_level - 1
+					if (data.now_level) {
+						this.identity = data.now_level - 1
+					}
 					this.getRoleList()
 					this.getPersonInfo()
 				})
@@ -470,6 +484,56 @@
 	page{background-color:#f9f9f9;}
 </style>
 <style scoped lang="less">
+	.percentage-bar {
+		width: 300rpx;
+		height: 24rpx;
+		background: #E6E6E6;
+		display: flex;
+		align-items: center;
+		position: relative;
+		.percentage-num, .percentage-num-r {
+			font-size: 20rpx;
+			position: absolute;
+			left: 10rpx;
+			z-index: 2;
+			color: #111;
+		}
+		.percentage-num-r {
+			left: unset;
+			right: 10rpx;
+		}
+		&__left {
+			background: #CBA868;
+			width: 20%;
+			height: 100%;
+			text-align: left;
+			box-sizing: border-box;
+			padding-left: 10rpx;
+			position: relative;
+		}
+		&__left::after {
+			content: '';
+			position: absolute;
+			right: 0;
+			width: 4rpx;
+			height: 34rpx;
+			background: #CBA868;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		// &__right {
+		// 	background: #E6E6E6;
+		// 	text-align: right;
+		// 	padding-right: 10rpx;
+		// }
+	}
+	.percentage-value.b {
+		margin-top: 0!important;
+		margin-bottom: 16rpx;
+	}
+	.percentage-text {
+		margin-top: 0!important;
+	}
 	.phone-number-btn {
 		display: inline-block;
 		background: transparent;

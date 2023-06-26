@@ -92,6 +92,7 @@
 														<checkbox color="#cba868" :value="`${item.goods_name}-${item.order_goods_id}`" :checked="item.checked" style="transform: scale(0.7);" />
 													</view>
 													<view>{{item.goods_name}}</view>
+													<view style="color: darkgray;margin-left: 10rpx">(剩余数量：{{ item.last_number }})</view>
 												</label>
 											</checkbox-group>
 						  </template>
@@ -207,10 +208,10 @@
 				if (!formData.province || !formData.city || !formData.county || !formData.detail_addr) {
 					return uni.showToast({ icon: 'none', title: '收获地址未填写完整' })
 				}
-				this.$api('/bus-create-order', formData).then((data) => {
-					if (data.code == 405) {
-						return uni.redirectTo({ url: '/pages/tip/tip?isError=1' })
-					}
+				if (!formData.remark) {
+					return uni.showToast({ icon: 'none', title: '申请原因不能为空' })
+				}
+				this.$api('/bus-create-order', formData, true).then((data) => {
 					uni.redirectTo({ url: '/pages/tip/tip?isError=0' })
 				})
 			},

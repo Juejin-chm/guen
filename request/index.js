@@ -6,11 +6,14 @@ const baseUrl = 'http://guen_czd.juejinvr.cn:8089/api'
 
 function hideLoading(msg, loading) {
 	loading && uni.hideLoading();
-	uni.showToast({
-		icon:"none",
-		title: msg,
-		duration: 3000
-	})
+	setTimeout(() => {
+		uni.showToast({
+			icon:"none",
+			title: msg,
+			duration: 3000
+		})
+	}, 50)
+	
 }
 
 // 全局请求封装

@@ -133,11 +133,11 @@
 							if (id) {
 								this.done(id)
 							}
-							// else {
-							// 	setTimeout(() => {
-							// 		uni.showToast({ icon: 'none', title: '未获取到id', duration: 2000 })
-							// 	}, 300)
-							// }
+							else {
+								setTimeout(() => {
+									uni.showToast({ icon: 'none', title: '上线后才能使用', duration: 2000 })
+								}, 300)
+							}
 						} else {
 							uni.showToast({
 								icon: 'none',

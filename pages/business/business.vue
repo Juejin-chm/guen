@@ -141,12 +141,20 @@
 				this.formData[key] = e.detail
 			},
 			submit(e){
-				this.formData.ds_is_topds_is_top = this.radio === '0'
 				if (this.type === 0) {
 					this.formData.bus_license = this.src1
 					this.formData.bus_hygiene_license = this.src2
 				}
 				if (this.type === 1) {
+					this.formData.ds_is_topds_is_top = this.radio === '0'
+					if (this.formData.ds_is_topds_is_top) {
+						if (!this.formData.ds_top_code) {
+							return uni.showToast({
+								icon: 'none',
+								title: '上级推广码不能为空'
+							})
+						}
+					}
 					this.formData.ds_identity_pic_positive = this.src1
 					this.formData.ds_identity_pic_negative = this.src2
 				}
@@ -162,9 +170,15 @@
 					}, false).then(() => {
 						uni.showToast({
 							icon: 'none',
-							msg: '提交成功'
+							title: '提交成功',
+							duration: 2000,
+							mask: true,
+							success() {
+								setTimeout(() => {
+									uni.navigateBack()
+								}, 2000)
+							}
 						})
-						uni.navigateBack()
 					})
 					return
 				}
