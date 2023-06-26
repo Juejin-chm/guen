@@ -33,7 +33,7 @@
 					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
 							<!-- <view :class="{dot: !item.isread}">{{item.title}}</view> -->
-							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
+							<view :class="{'dot gold': !item.isread}">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>

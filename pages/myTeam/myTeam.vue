@@ -43,19 +43,23 @@
 					isCenter:true,
 				},
 				data: {},
-				date: ''
+				date: '',
+				page: 1,
+				total: 0
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
 		methods: {
-			getList(search_month) {
-				this.$api('/my-team', {search_month}).then(({data}) => {
+			getList(search_month = this.date, page = this.page) {
+				this.$api('/my-team', {search_month, page}).then(({data}) => {
 					this.data = data
+					this.total = data.total
 				})
 			},
 			bindDateChange(e) {
+				this.page = 1
 				this.date = e.detail.value
 				this.getList(this.date)
 			}

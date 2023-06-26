@@ -125,20 +125,20 @@
 		methods: {
 			getMore() {
 				if (this.list.length >= this.total) {
-					return
+					return console.warn('没有更多了哟~')
 				}
 				this.curPage += 1
 				if (this.status == 2) {
 					this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
-						data.data.forEach(item => {
-							this.list.push(item)
-							this.total = data.total
-						})
+						this.list.push(...data.data)
+						this.total = data.total
+						
 					})
 				}
 				if (this.status == 1) {
 					this.$api('/box-order-msg-list', {search_month: this.date, search_status: this.tabIndex , page: this.curPage}).then(({data}) => {
-						this.list = data.data
+						// this.list = data.data
+						this.list.push(...data.data)
 						this.total = data.total
 					})
 				}
@@ -207,6 +207,7 @@
 			},
 			clickTab(v) {
 				this.curPage = 1
+				this.date = ''
 				this.status = v
 				if (v === 2) {
 					this.getList()

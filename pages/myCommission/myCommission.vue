@@ -76,19 +76,37 @@
 					isCenter:true,
 				},
 				date: '',
-				data: {}
+				data: {},
+				total: 0,
+				curPage: 1
 			}
 		},
-		onPullDownRefresh() {
-			console.log('refresh...');
+		onReachBottom() {
+			this.getMore(this.curPage)
 		},
 		onLoad() {
 			this.getList()
 		},
 		methods: {
+			getMore() {
+				if (this.data.datas.data.length >= this.total) {
+					return
+				}
+				// return
+				// this.curPage += 1
+				// if (this.status == 2) {
+				// 	this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
+				// 		data.data.forEach(item => {
+				// 			this.list.push(item)
+				// 			this.total = data.total
+				// 		})
+				// 	})
+				// }
+			},
 			getList(search_month) {
 				this.$api('/commission-list', { search_month }).then(({data}) => {
 					this.data = data
+					this.total = data.datas.total
 				})
 			},
 			bindDateChange(e) {

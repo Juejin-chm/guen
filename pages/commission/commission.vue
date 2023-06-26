@@ -56,7 +56,7 @@
 				<view class="msgul" v-else>
 					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
-							<view :class="{dot: !item.isread, gold: item.cont}">{{item.title}}</view>
+							<view :class="{ 'dot gold': !item.isread }">{{item.title}}</view>
 						</view>
 						<view class="time">{{item.format_time}}</view>
 					</view>
@@ -127,7 +127,8 @@
 				list: [],
 				detail: {},
 				date: '',
-				msgList: []
+				msgList: [],
+				page: 1
 			}
 		},
 		onLoad() {
@@ -136,6 +137,8 @@
 		methods: {
 			tabClick(val) {
 				this.status = val
+				this.page = 1
+				this.date = ''
 				if (this.status == 2) {
 					this.getMsgList()
 				} else {
@@ -145,16 +148,16 @@
 			close() {
 				this.showPop = false
 			},
-			getList(month) {
+			getList(month = this.date, page = this.page) {
 				this.$api('/tgds-msg-list', {
-					search_month: month
+					search_month: month,
+					page
 				}).then(({data}) => {
-					console.log(data ,1111);
 					this.list = data.data
 				})
 			},
-			getMsgList(search_month) {
-				this.$api('/platform-message-list', {search_month}).then(({data}) => {
+			getMsgList(search_month, page = this.page) {
+				this.$api('/platform-message-list', {search_month, page}).then(({data}) => {
 					this.msgList = data.data
 				})
 			},
@@ -171,6 +174,7 @@
 			},
 			bindDateChange(e) {
 				this.date = e.detail.value
+				this.page = 1
 				this.getList(this.date)
 			}
 		}
