@@ -54,7 +54,7 @@
 					</view> -->
 				</view>
 				<view class="msgul" v-else>
-					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
+					<view v-for="item in list" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
 							<view :class="{ 'dot gold': !item.isread }">{{item.title}}</view>
 						</view>
@@ -127,14 +127,34 @@
 				list: [],
 				detail: {},
 				date: '',
-				msgList: [],
-				page: 1
+				page: 1,
+				total: 0
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
+		onReachBottom() {
+			this.getMore()
+		},
 		methods: {
+			getMore() {
+				if (this.list.length >= this.total) {
+					return console.warn('没有更多了');
+				}
+				this.page += 1
+				if (this.status == 2) {
+					this.$api('/platform-message-list', {search_month: this.date, page: this.page}).then(({data}) => {
+						this.list.push(...data.data)
+						this.total = data.total
+					})
+				} else {
+					this.$api('/tgds-msg-list', { search_month: this.date, page: this.page }).then(({data}) => {
+						this.list.push(...data.data)
+						this.total = data.total
+					})
+				}
+			},
 			tabClick(val) {
 				this.status = val
 				this.page = 1
@@ -154,11 +174,13 @@
 					page
 				}).then(({data}) => {
 					this.list = data.data
+					this.total = data.total
 				})
 			},
 			getMsgList(search_month, page = this.page) {
 				this.$api('/platform-message-list', {search_month, page}).then(({data}) => {
-					this.msgList = data.data
+					this.list = data.data
+					this.total = data.total
 				})
 			},
 			cliPop(id){

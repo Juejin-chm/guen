@@ -4,7 +4,7 @@
 		<CustomBar :barConfig='barConfig'></CustomBar>
 		
 		<view class="otabs">
-			<view v-for="item in tabs" :key="item.key" :class="{cur: item.key == curTab}" @click="tabChange(item.key)">{{item.value}}</view>
+			<view v-for="item in tabs" :key="item.key" :class="{cur: item.key == query.search_status}" @click="tabChange(item.key)">{{item.value}}</view>
 			
 			<!-- <view>待投放</view>
 			<view>已投放</view>
@@ -15,9 +15,9 @@
 				<view class="ex-name flex-between">
 					<view class="le">全部订单</view>
 					<view class="timer">
-						<picker mode="date" :value='date' fields="month" @change="bindDateChange">
+						<picker mode="date" :value="query.search_month" fields="month" @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
-							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
+							<text :class="[query.search_month ? 'hei' : '']">{{query.search_month ? query.search_month : '请选择'}}</text>
 						</picker>
 					</view>
 				</view>
@@ -63,43 +63,65 @@
 					isCenter:true,
 				},
 				tabs: [],
-				curTab: 'all',
-				date: undefined,
-				list: []
+				// curTab: 'all',
+				// date: undefined,
+				list: [],
+				query: {
+					search_month: '',
+					search_status: 'all',
+					page: 1
+				},
+				total: 0
 			}
 		},
 		onLoad(option) {
-			this.curTab = option.key =='all' ? option.key : +option.key + 1
+			// this.curTab = option.key =='all' ? option.key : +option.key + 1
+			this.query.search_status = option.key =='all' ? option.key : +option.key + 1
 			console.log(option, 'option');
 			this.$api('/order-const').then(({data}) => {
 				console.log(data, 'data');
 				this.tabs = data
 			})
-			this.getList(this.curTab)
+			this.getList()
+		},
+		onReachBottom() {
+			this.getMore()
 		},
 		methods: {
+			getMore() {
+				if (this.list.length >= this.total) {
+					return console.warn('没有更多了')
+				}
+				this.query.page += 1
+				this.$api('/order-list', query).then(({data}) => {
+					console.log(data, '/order-list 接口response');
+					this.list.push(...data.data)
+					this.total = data.total
+				})
+			},
 			goDetail(id) {
 				uni.navigateTo({
 					url: '/pages/orderDetail/orderDetail?id=' + id
 				})
 			},
-			getList(status, month) {
-				this.$api('/order-list', {
-					search_status: status,
-					search_month: month
-				}).then(({data}) => {
-					console.log(data, '123data');
+			getList(query = this.query) {
+				this.$api('/order-list', query).then(({data}) => {
+					console.log(data, '/order-list 接口response');
 					this.list = data.data
+					this.total = data.total
 				})
 			},
 			tabChange(key) {
-				this.curTab = key
-				this.getList(key, this.date)
+				this.query.search_status = key
+				this.query.page = 1
+				this.query.search_month = ''
+				this.getList()
 			},
 			bindDateChange(e){
-				this.date = e.detail.value;
-				this.getList(this.curTab, this.date)
-			},
+				this.query.search_month = e.detail.value
+				this.query.page = 1
+				this.getList()
+			}
 		}
 	}
 </script>

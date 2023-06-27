@@ -30,7 +30,7 @@
 					
 				</view>
 				<view class="msgul" v-else>
-					<view v-for="item in msgList" :key="item.id" class="msgli" @tap="goDetail(item.id)">
+					<view v-for="item in list" :key="item.id" class="msgli" @tap="goDetail(item.id)">
 						<view>
 							<!-- <view :class="{dot: !item.isread}">{{item.title}}</view> -->
 							<view :class="{'dot gold': !item.isread}">{{item.title}}</view>
@@ -85,42 +85,43 @@
 				showPop:false,
 				status:1, //1-订单通知  2-平台消息
 				list: [],
-				msgList: [],
+				// msgList: [],
 				query: {
 					page: 1,
 					search_month: ''
-				}
+				},
+				total: 0
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
 		onReachBottom() {
-			// this.getMore(this.curPage)
+			this.getMore()
 		},
 		methods: {
-			// getMore() {
-			// 	if (this.list.length >= this.total) {
-			// 		return
-			// 	}
-			// 	this.curPage += 1
-			// 	if (this.status == 2) {
-			// 		this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
-			// 			data.data.forEach(item => {
-			// 				this.list.push(item)
-			// 				this.total = data.total
-			// 			})
-			// 		})
-			// 	}
-			// 	if (this.status == 1) {
-			// 		this.$api('/box-order-msg-list', {search_month: this.date, search_status: this.tabIndex , page: this.curPage}).then(({data}) => {
-			// 			this.list = data.data
-			// 			this.total = data.total
-			// 		})
-			// 	}
+			getMore() {
+				if (this.list.length >= this.total) {
+					return console.warn('没有更多了')
+				}
+				this.query.page += 1
+				if (this.status == 2) {
+					this.$api('/platform-message-list', this.query).then(({data}) => {
+						this.list.push(...data.data)
+						this.total = data.total
+					})
+				}
+				if (this.status == 1) {
+					this.$api('/ggz-order-msg-list', this.query).then(({data}) => {
+						this.list.push(...data.data)
+						this.total = data.total
+					})
+				}
 				
-			// },
+			},
 			tabClick(v) {
+				this.query.page = 1
+				this.query.search_month = ''
 				this.status = v
 				if (v == 1) {
 					this.getList()
@@ -128,12 +129,18 @@
 					this.getMsgList()
 				}
 			},
-			getMsgList(search_month) {
-				this.$api('/platform-message-list', {search_month}).then(({data}) => {
-					this.msgList = data.data
+			getMsgList(query = this.query) {
+				this.$api('/platform-message-list', query).then(({data}) => {
+					this.list = data.data
+					this.total = data.total
 				})
 			},
-			
+			getList(query = this.query) {
+				this.$api('/ggz-order-msg-list', query).then(({data}) => {
+					this.list = data.data
+					this.total = data.total
+				})
+			},
 			bindDateChange(e) {
 				this.query.search_month = e.detail.value
 				this.query.page = 1
@@ -143,11 +150,7 @@
 					this.getMsgList()
 				}
 			},
-			getList(query = this.query) {
-				this.$api('/ggz-order-msg-list', query).then(({data}) => {
-					this.list = data.data
-				})
-			},
+			
 			cliPop(id){
 				this.showPop = true
 				this.$api('/ggz-order-msg-detail/' + id).then(({data}) => {

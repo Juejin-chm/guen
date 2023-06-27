@@ -8,15 +8,15 @@
 				<view class="ex-name flex-between">
 					<view class="le">团队列表</view>
 					<view class="timer">
-						<picker mode="date" :value='date' fields="month" @change="bindDateChange">
+						<picker mode="date" :value='query.search_month' fields="month" @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
-							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
+							<text :class="[query.search_month ? 'hei' : '']">{{query.search_month ? query.search_month : '请选择' }}</text>
 						</picker>
 					</view>
 				</view>
 				
 				<view class="msgul">
-					<view v-for="item in data.data" :key="item.id" class="msgli">
+					<view v-for="item in list" :key="item.id" class="msgli">
 						<image :src="item.avatar" mode=""></image>
 						<view>
 							<view>{{item.name}}</view>
@@ -42,26 +42,46 @@
 					hasRetun:true,
 					isCenter:true,
 				},
-				data: {},
-				date: '',
-				page: 1,
+				list: [],
+				// date: '',
+				// page: 1,
+				query: {
+					page: 1,
+					search_month: '',
+					limit: 20
+				},
 				total: 0
 			}
 		},
 		onLoad() {
 			this.getList()
 		},
+		onReachBottom() {
+			this.getMore()
+		},
 		methods: {
-			getList(search_month = this.date, page = this.page) {
-				this.$api('/my-team', {search_month, page}).then(({data}) => {
-					this.data = data
+			getMore() {
+				if (this.list.length >= this.total) {
+					return console.warn('没有更多了')
+				}
+				this.query.page += 1
+				this.$api('/my-team', this.query).then(({data}) => {
+					this.list.push(...data.data)
+					this.total = data.total
+				})
+			},
+			getList(query = this.query) {
+				this.$api('/my-team', query).then(({data}) => {
+					this.list = data.data
 					this.total = data.total
 				})
 			},
 			bindDateChange(e) {
-				this.page = 1
-				this.date = e.detail.value
-				this.getList(this.date)
+				// this.page = 1
+				// this.date = e.detail.value
+				this.query.page = 1
+				this.query.search_month = e.detail.value
+				this.getList()
 			}
 		}
 	}

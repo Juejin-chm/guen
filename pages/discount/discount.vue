@@ -53,15 +53,31 @@
 					hasRetun:true,
 					isCenter:true,
 				},
-				list: []
+				list: [],
+				query: {
+					page: 1,
+					limit: 20
+				}
 			}
 		},
+		onReachBottom() {
+			this.getMore()
+		},
 		onLoad() {
-			this.$api('/discount-package-list').then(({data}) => {
+			this.$api('/discount-package-list', this.query).then(({data}) => {
 				this.list = data
 			})
 		},
 		methods: {
+			getMore() {
+				if (this.list.length < this.query.page * this.query.limit) {
+					return console.warn('没有更多了')
+				}
+				this.query.page += 1
+				this.$api('/discount-package-list', this.query).then(({data}) => {
+					this.list.push(...data)
+				})
+			},
 			goDetail(id) {
 				console.log(id, 'id');
 				uni.navigateTo({

@@ -26,15 +26,15 @@
 				<view class="ex-name flex-between">
 					<view class="le">佣金消息</view>
 					<view class="timer">
-						<picker mode="date" fields="month" :value='date' @change="bindDateChange">
+						<picker mode="date" fields="month" :value='query.search_month' @change="bindDateChange">
 							<image src="@/static/image/date.png"></image>
-							<text :class="[date?'hei':'']">{{date?date:'请选择'}}</text>
+							<text :class="[query.search_month?'hei':'']">{{query.search_month?query.search_month:'请选择'}}</text>
 						</picker>
 					</view>
 				</view>
 				
 				<view class="msgul">
-					<view v-for="(item, index) in data.datas.data" :key="index" class="msgli">
+					<view v-for="(item, index) in list" :key="index" class="msgli">
 						<image :src="item.avatar" mode=""></image>
 						<view>
 							<view>{{item.name}}</view>
@@ -75,14 +75,19 @@
 					hasRetun:true,
 					isCenter:true,
 				},
-				date: '',
+				// date: '',
+				list: [],
 				data: {},
 				total: 0,
-				curPage: 1
+				curPage: 1,
+				query: {
+					page: 1,
+					search_month: ''
+				}
 			}
 		},
 		onReachBottom() {
-			this.getMore(this.curPage)
+			this.getMore()
 		},
 		onLoad() {
 			this.getList()
@@ -90,8 +95,13 @@
 		methods: {
 			getMore() {
 				if (this.data.datas.data.length >= this.total) {
-					return
+					return console.log('没有更多了')
 				}
+				this.query.page += 1
+				this.$api('/commission-list', query).then(({data}) => {
+					this.list.push(...data.datas.data)
+					this.total = data.datas.total
+				})
 				// return
 				// this.curPage += 1
 				// if (this.status == 2) {
@@ -103,15 +113,16 @@
 				// 	})
 				// }
 			},
-			getList(search_month) {
-				this.$api('/commission-list', { search_month }).then(({data}) => {
+			getList(query = this.query) {
+				this.$api('/commission-list', query).then(({data}) => {
 					this.data = data
+					this.list = data.datas.data
 					this.total = data.datas.total
 				})
 			},
 			bindDateChange(e) {
-				this.date = e.detail.value
-				this.getList(this.date)
+				this.query.search_month = e.detail.value
+				this.getList()
 			}
 		}
 	}
