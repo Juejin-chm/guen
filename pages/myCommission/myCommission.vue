@@ -79,7 +79,6 @@
 				list: [],
 				data: {},
 				total: 0,
-				curPage: 1,
 				query: {
 					page: 1,
 					search_month: ''
@@ -94,24 +93,14 @@
 		},
 		methods: {
 			getMore() {
-				if (this.data.datas.data.length >= this.total) {
-					return console.log('没有更多了')
+				if (this.list.length >= this.total) {
+					return console.warn('没有更多了')
 				}
 				this.query.page += 1
-				this.$api('/commission-list', query).then(({data}) => {
+				this.$api('/commission-list', this.query).then(({data}) => {
 					this.list.push(...data.datas.data)
 					this.total = data.datas.total
 				})
-				// return
-				// this.curPage += 1
-				// if (this.status == 2) {
-				// 	this.$api('/platform-message-list', {search_month: this.date, page: this.curPage}).then(({data}) => {
-				// 		data.data.forEach(item => {
-				// 			this.list.push(item)
-				// 			this.total = data.total
-				// 		})
-				// 	})
-				// }
 			},
 			getList(query = this.query) {
 				this.$api('/commission-list', query).then(({data}) => {
@@ -122,6 +111,7 @@
 			},
 			bindDateChange(e) {
 				this.query.search_month = e.detail.value
+				this.query.page = 1
 				this.getList()
 			}
 		}

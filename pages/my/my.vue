@@ -24,7 +24,7 @@
 								</view>
 								<view class="li" style="margin-top: 0;margin-left: 30rpx;">
 									<image src="@/static/image/n2.png"></image>
-									<text>{{user.role_info.ds_plug_addr}}</text>
+									<text style="max-width: 300rpx">{{user.role_info.ds_plug_addr}}</text>
 								</view>
 							</template>
 							<view class="li" v-if="identity==3">
