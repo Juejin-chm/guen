@@ -366,13 +366,13 @@
 			
 			
 			gotoApplyBox() {
-				// if (this.user.has_no_finish_order) {
-				// 	return uni.showToast({
-				// 		icon: 'none',
-				// 		title: '有未确认的订单，不能申请盒子',
-				// 		duration: 3000
-				// 	})
-				// }
+				if (this.user.has_no_finish_order) {
+					return uni.showToast({
+						icon: 'none',
+						title: '有未确认的订单，不能申请盒子',
+						duration: 3000
+					})
+				}
 				uni.navigateTo({
 					url: '/pages/applyBox/applyBox'
 				})

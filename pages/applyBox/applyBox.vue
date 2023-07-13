@@ -176,9 +176,9 @@
 							uni.showToast({ icon: 'none', title: '盒子数量不能为空' })
 							throw('this.boxNumber 有问题')
 						}
-						if (!(this.boxNumber[key][index] > 0)) {
-							uni.showToast({ icon: 'none', title: '请填写大于0的盒子数量' })
-							throw('请填写大于0的盒子数量')
+						if (!(this.boxNumber[key][index] > 0 && this.boxNumber[key][index] <= 1000)) {
+							uni.showToast({ icon: 'none', title: '请填写小于1000的盒子数量', duration: 4000 })
+							throw('请填写小于1000的盒子数量')
 						}
 						order_goods.push({ id: this.delId(item, true), number: this.boxNumber[key][index] })
 					})
@@ -262,7 +262,11 @@
 			},
 			
 			showChoose(){
-				this.show = true;
+				if (this.boxInfo.orderGoodsCate?.length) {
+					this.show = true;
+				} else {
+					uni.showToast({ icon: 'none', title: '暂无可选盒子' })
+				}
 			},
 			onClose(){
 				this.show = false;

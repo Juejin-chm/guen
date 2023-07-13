@@ -183,7 +183,7 @@
 					return
 				}
 				this.$api('/join-us-form-submit', this.formData, false).then((data) => {
-					uni.navigateTo({
+					uni.redirectTo({
 						url:'../tip/tip?isError=0'
 					})
 				})
