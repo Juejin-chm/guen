@@ -273,12 +273,12 @@
 			}
 		},
 		onLoad(options) {
-			console.log(options, 'my options')
-			const scene = decodeURIComponent(options.scene)
-			console.log(scene, 'scene...')
-			if (scene) {
-				uni.setStorageSync('scene', scene)
-			}			
+			// console.log(options, 'my options')
+			// const scene = decodeURIComponent(options.scene)
+			// console.log(scene, 'scene...')
+			// if (scene) {
+			// 	uni.setStorageSync('scene', scene)
+			// }			
 			// this.scanCode()
 		},
 		onShow() {
@@ -295,24 +295,24 @@
 			
 		},
 		methods: {
-			scanCode() {
-				// 允许从相机和相册扫码
-				uni.scanCode({
-					scanType: ['qrCode'],
-					success: function(res) {
-						// 微信小程序
-						if (res.errMsg == "scanCode:ok") {
-							// 扫描到的信息
-							console.log(res, '扫码返回的结果')
-						} else {
-							uni.showToast({
-								icon: 'none',
-								title: '二维码扫描失败'
-							})
-						}
-					}
-				});
-			},
+			// scanCode() {
+			// 	// 允许从相机和相册扫码
+			// 	uni.scanCode({
+			// 		scanType: ['qrCode'],
+			// 		success: function(res) {
+			// 			// 微信小程序
+			// 			if (res.errMsg == "scanCode:ok") {
+			// 				// 扫描到的信息
+			// 				console.log(res, '扫码返回的结果')
+			// 			} else {
+			// 				uni.showToast({
+			// 					icon: 'none',
+			// 					title: '二维码扫描失败'
+			// 				})
+			// 			}
+			// 		}
+			// 	});
+			// },
 			getRoleList() {
 				this.$api('/role-list').then(({data}) => {
 					this.idenArr[0].hasAuth = data[1].has_role
@@ -346,7 +346,7 @@
 			getAvatar(tempFilePath) {
 				return new Promise((resolve, rej) => {
 					uni.uploadFile({
-						url: 'http://guen_czd.juejinvr.cn:8089/api/upload-img',
+						url: 'https://guenxiamen.com/api/upload-img',
 						filePath: tempFilePath,
 						name: 'file',
 						header: {

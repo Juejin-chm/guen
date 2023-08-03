@@ -69,8 +69,7 @@
 				// const codeimg = qrCodePath;
 				let codeimg = await this.getImageInfo(qrCodePath)
 				ctx.drawImage(bg, 0, 0, 345, 545);
-				console.log(codeimg, '111111111111')
-			 ctx.drawImage(codeimg.tempFilePath, 125, 316, 106, 106);
+				ctx.drawImage(codeimg.tempFilePath, 125, 316, 106, 106);
 				ctx.setFontSize(15)
 				ctx.setTextAlign('center')
 				ctx.fillText(title, 176, 130)

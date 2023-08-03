@@ -4,7 +4,10 @@ export function login () {
 		const name = uni.getStorageSync('nickname')
 		const avatar = uni.getStorageSync('avatarUrl')
 		const phone = uni.getStorageSync('phone')
-		const invite_user = uni.getStorageSync('scene')
+		const scene = uni.getStorageSync('scene') // 这时候scene的值应该是 invite_user=xxx
+		const invite_user = scene?.split('=')[1]
+		console.log(invite_user, '----');
+		console.log('invite_user 的值：', invite_user+'');
 		if (!name) {
 			uni.showToast({
 				icon: 'none',

@@ -128,14 +128,14 @@
 						// 微信小程序
 						if (res.errMsg == "scanCode:ok") {
 							// 扫描到的信息
-							const id = getParameter('id', res.path)
+							const id = getParameter('order_id', res.path)
 							console.log(res, id, '扫码返回的结果 和 id')
 							if (id) {
 								this.done(id)
 							}
 							else {
 								setTimeout(() => {
-									uni.showToast({ icon: 'none', title: '上线后才能使用', duration: 2000 })
+									uni.showToast({ icon: 'none', title: 'id 错误', duration: 2000 })
 								}, 300)
 							}
 						} else {

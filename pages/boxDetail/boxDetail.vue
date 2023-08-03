@@ -101,14 +101,22 @@
 		onLoad(options) {
 			this.status = options.status;
 			
-			this.$api('/box-order-info/' + options.id).then(({data, code})=> {
+			this.getDetail(options.id)
+			// this.$api('/box-order-info/' + options.id).then(({data, code})=> {
 				
-				this.detail = data.order
-				this.phone = data.phone
-				this.barConfig.title = '订单' + this.detail.transport_status_txt
-			})
+			// 	this.detail = data.order
+			// 	this.phone = data.phone
+			// 	this.barConfig.title = '订单' + this.detail.transport_status_txt
+			// })
 		},
 		methods: {
+			getDetail(id) {
+				this.$api('/box-order-info/' + id).then(({data, code})=> {
+					this.detail = data.order
+					this.phone = data.phone
+					this.barConfig.title = '订单' + this.detail.transport_status_txt
+				})
+			},
 			copyMessage(text) {
 				uni.setClipboardData({
 				        data: text,
@@ -136,10 +144,14 @@
 			},
 			done(id) {
 				this.$api('/confirm-finish-order/' + id).then(({data}) => {
-					this.detail = data.order
+					// this.detail = data.order
+					
 					uni.showToast({
 						icon: 'none',
-						title: '提交成功'
+						title: '提交成功',
+						success: () => {
+							this.getDetail(id)
+						}
 					})
 				})
 			},
@@ -147,17 +159,18 @@
 				// 允许从相机和相册扫码
 				uni.scanCode({
 					success: (res) => {
+							console.log(res, 'scanCode');
 						// 微信小程序
 						if (res.errMsg == "scanCode:ok") {
 							// 扫描到的信息
-							const id = getParameter('id', res.path)
+							const id = getParameter('order_id', res.path)
 							console.log(res, id, '扫码返回的结果 和 id')
 							if (id) {
 								this.done(id)
 							}
 							else {
 								setTimeout(() => {
-									uni.showToast({ icon: 'none', title: '上线后才能使用', duration: 2000 })
+									uni.showToast({ icon: 'none', title: 'id 错误', duration: 2000 })
 								}, 300)
 							}
 						} else {

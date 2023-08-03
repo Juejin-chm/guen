@@ -208,7 +208,7 @@
 				  success:(res)=>{
 						this[`src${e}`] = res.tempFiles[0].tempFilePath;
 						uni.uploadFile({
-							url: 'http://guen_czd.juejinvr.cn:8089/api/upload-img',
+							url: 'https://guenxiamen.com/api/upload-img',
 							filePath: res.tempFiles[0].tempFilePath,
 							name: 'file',
 							header: {

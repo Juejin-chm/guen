@@ -78,9 +78,19 @@
 				<view class="cellbor cellbor-le">
 					<van-cell-group :border="false">
 						<view class="space spaceNum">
-							<view>已提取佣金<text> -￥{{detail.order_commission}}</text></view>
-							<view>剩余可提取佣金<text>￥{{detail.user_available_money}}</text></view>
-							<view>不可提取佣金<text>￥{{detail.user_frozen_money}}</text></view>
+							<template v-if="detail.avatar">
+								<view class="head">
+									<image :src="detail.avatar" style="width: 84rpx;height: 84rpx;"></image>
+									<text>{{ detail.name }}</text>
+								</view>
+							</template>
+							<template v-else>
+								<view v-if="detail.user_tq_commission">已提取佣金<text> -￥{{detail.user_tq_commission}}</text></view>
+								<view v-else>收到佣金<text> +￥{{detail.order_commission}}</text></view>
+								<view>剩余可提取佣金<text>￥{{detail.user_available_money}}</text></view>
+								<view>不可提取佣金<text>￥{{detail.user_frozen_money}}</text></view>
+							</template>
+							
 						</view>
 					</van-cell-group>
 				</view>

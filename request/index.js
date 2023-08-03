@@ -2,7 +2,7 @@
 const defauls = {
 	method: "POST"
 }
-const baseUrl = 'http://guen_czd.juejinvr.cn:8089/api'
+const baseUrl = 'https://guenxiamen.com/api'
 
 function hideLoading(msg, loading) {
 	loading && uni.hideLoading();
